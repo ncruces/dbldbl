@@ -1,3 +1,4 @@
+// Package dbldbl provides double-double precision arithmetic.
 package dbldbl
 
 // Number is a double-double precision number.
