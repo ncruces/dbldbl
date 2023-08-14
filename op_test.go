@@ -3,7 +3,6 @@ package dbldbl
 import (
 	"math"
 	"math/big"
-	"reflect"
 	"testing"
 )
 
@@ -20,7 +19,7 @@ func TestNeg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Neg(tt.arg); !reflect.DeepEqual(got, tt.want) {
+			if got := Neg(tt.arg); !same(got, tt.want) {
 				t.Errorf("Neg() = %v, want %v", got, tt.want)
 			}
 		})
@@ -33,13 +32,39 @@ func TestAbs(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Number{1, 0}, Number{1, 0}},
-		{Number{-1, 0}, Number{1, -0}},
+		{Number{+1, 0}, Number{1, 0}},
+		{Number{-1, 0}, Number{1, 0}},
+		{Number{+1, 0.5}, Number{1, +0.5}},
+		{Number{-1, 0.5}, Number{1, -0.5}},
+		{Number{math.Inf(+1), 0}, Number{math.Inf(1), 0}},
+		{Number{math.Inf(-1), 0}, Number{math.Inf(1), 0}},
+		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Abs(tt.arg); !reflect.DeepEqual(got, tt.want) {
+			if got := Abs(tt.arg); !same(got, tt.want) {
 				t.Errorf("Abs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsInf(t *testing.T) {
+	tests := []struct {
+		arg  Number
+		want bool
+	}{
+		{Number{}, false},
+		{Number{+1, 0}, false},
+		{Number{-1, 0}, false},
+		{Number{math.Inf(+1), 0}, true},
+		{Number{math.Inf(-1), 0}, true},
+		{Number{math.NaN(), 0}, false},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := IsInf(tt.arg, 0); got != tt.want {
+				t.Errorf("IsInf() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -55,10 +80,12 @@ func TestTrunc(t *testing.T) {
 		{Number{0.5, 0}, Number{0, 0}},
 		{Number{1.5, 0}, Number{1, 0}},
 		{Number{1.5, 0.5}, Number{1, 0}},
+		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}},
+		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Trunc(tt.arg); !reflect.DeepEqual(got, tt.want) {
+			if got := Trunc(tt.arg); !same(got, tt.want) {
 				t.Errorf("Trunc() = %v, want %v", got, tt.want)
 			}
 		})
@@ -71,41 +98,169 @@ func TestShift(t *testing.T) {
 		exp  int16
 		want Number
 	}{
-		{Number{}, 1, Number{}},
-		{Number{1, 0}, 1, Number{2, 0}},
+		{Number{}, +1, Number{}},
+		{Number{}, -1, Number{}},
+		{Number{1, 0}, +1, Number{2, 0}},
 		{Number{1, 0}, -1, Number{0.5, 0}},
 		{Number{-1, 0.5}, 1, Number{-2, 1}},
+		{Number{math.Inf(1), 0}, +1, Number{math.Inf(1), 0}},
+		{Number{math.Inf(1), 0}, -1, Number{math.Inf(1), 0}},
+		{Number{math.NaN(), 0}, +1, Number{math.NaN(), 0}},
+		{Number{math.NaN(), 0}, -1, Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Shift(tt.arg, tt.exp); !reflect.DeepEqual(got, tt.want) {
+			if got := Shift(tt.arg, tt.exp); !same(got, tt.want) {
 				t.Errorf("Shift() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestAddFloats(t *testing.T) {
+func TestAdd(t *testing.T) {
 	want := Add(Float(math.E), Float(math.Pi))
 	got := AddFloats(math.E, math.Pi)
-	if !reflect.DeepEqual(got, want) {
+	if !same(got, want) {
 		t.Errorf("AddFloats() = %v, want %v", got, want)
 	}
-}
 
-func TestSubFloats(t *testing.T) {
-	want := Sub(Float(math.E), Float(math.Pi))
-	got := SubFloats(math.E, math.Pi)
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("SubFloats() = %v, want %v", got, want)
+	tests := []struct {
+		arg1 float64
+		arg2 float64
+		want float64
+	}{
+		{math.Inf(+1), -1, math.Inf(+1)},
+		{math.Inf(-1), +1, math.Inf(-1)},
+		{+1, math.Inf(+1), math.Inf(+1)},
+		{-1, math.Inf(-1), math.Inf(-1)},
+		{math.Inf(+1), math.Inf(+1), math.Inf(+1)},
+		{math.Inf(-1), math.Inf(-1), math.Inf(-1)},
+		{math.Inf(+1), math.Inf(-1), math.NaN()},
+		{math.Inf(-1), math.Inf(+1), math.NaN()},
+		{math.NaN(), 0, math.NaN()},
+		{0, math.NaN(), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := AddFloats(tt.arg1, tt.arg2); !same(got, Float(tt.want)) {
+				t.Errorf("AddFloats() = %v, want %v", got, tt.want)
+			}
+			if got := AddFloat(Float(tt.arg1), tt.arg2); !same(got, Float(tt.want)) {
+				t.Errorf("AddFloat() = %v, want %v", got, tt.want)
+			}
+			if got := Add(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
+				t.Errorf("Add() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
-func TestMulFloats(t *testing.T) {
+func TestSub(t *testing.T) {
+	want := Sub(Float(math.E), Float(math.Pi))
+	got := SubFloats(math.E, math.Pi)
+	if !same(got, want) {
+		t.Errorf("SubFloats() = %v, want %v", got, want)
+	}
+
+	tests := []struct {
+		arg1 float64
+		arg2 float64
+		want float64
+	}{
+		{math.Inf(+1), -1, math.Inf(+1)},
+		{math.Inf(-1), +1, math.Inf(-1)},
+		{+1, math.Inf(+1), math.Inf(-1)},
+		{-1, math.Inf(-1), math.Inf(+1)},
+		{math.Inf(+1), math.Inf(+1), math.NaN()},
+		{math.Inf(-1), math.Inf(-1), math.NaN()},
+		{math.Inf(+1), math.Inf(-1), math.Inf(+1)},
+		{math.Inf(-1), math.Inf(+1), math.Inf(-1)},
+		{math.NaN(), 0, math.NaN()},
+		{0, math.NaN(), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := SubFloats(tt.arg1, tt.arg2); !same(got, Float(tt.want)) {
+				t.Errorf("SubFloats() = %v, want %v", got, tt.want)
+			}
+			if got := SubFloat(Float(tt.arg1), tt.arg2); !same(got, Float(tt.want)) {
+				t.Errorf("SubFloat() = %v, want %v", got, tt.want)
+			}
+			if got := Sub(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
+				t.Errorf("Sub() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMul(t *testing.T) {
 	want := Mul(Float(math.E), Float(math.Pi))
 	got := MulFloats(math.E, math.Pi)
-	if !reflect.DeepEqual(got, want) {
+	if !same(got, want) {
 		t.Errorf("SubFloats() = %v, want %v", got, want)
+	}
+
+	tests := []struct {
+		arg1 float64
+		arg2 float64
+		want float64
+	}{
+		{math.Inf(+1), -1, math.Inf(-1)},
+		{math.Inf(-1), +1, math.Inf(-1)},
+		{+1, math.Inf(+1), math.Inf(+1)},
+		{-1, math.Inf(-1), math.Inf(+1)},
+		{math.Inf(+1), math.Inf(+1), math.Inf(+1)},
+		{math.Inf(-1), math.Inf(-1), math.Inf(+1)},
+		{math.Inf(+1), math.Inf(-1), math.Inf(-1)},
+		{math.Inf(-1), math.Inf(+1), math.Inf(-1)},
+		{math.Inf(+1), 0, math.NaN()},
+		{math.Inf(-1), 0, math.NaN()},
+		{0, math.Inf(+1), math.NaN()},
+		{0, math.Inf(-1), math.NaN()},
+		{math.NaN(), 0, math.NaN()},
+		{0, math.NaN(), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := MulFloats(tt.arg1, tt.arg2); !same(got, Float(tt.want)) {
+				t.Errorf("MulFloats() = %v, want %v", got, tt.want)
+			}
+			if got := MulFloat(Float(tt.arg1), tt.arg2); !same(got, Float(tt.want)) {
+				t.Errorf("MulFloat() = %v, want %v", got, tt.want)
+			}
+			if got := Mul(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
+				t.Errorf("Mul() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDiv(t *testing.T) {
+	tests := []struct {
+		arg1 float64
+		arg2 float64
+		want float64
+	}{
+		{math.Inf(+1), -1, math.Inf(-1)},
+		{math.Inf(-1), +1, math.Inf(-1)},
+		{math.Inf(+1), math.Inf(+1), math.NaN()},
+		{math.Inf(-1), math.Inf(-1), math.NaN()},
+		{math.Inf(+1), math.Inf(-1), math.NaN()},
+		{math.Inf(-1), math.Inf(+1), math.NaN()},
+		{math.Inf(+1), 0, math.Inf(+1)},
+		{math.Inf(-1), 0, math.Inf(-1)},
+		{math.NaN(), 0, math.NaN()},
+		{0, math.NaN(), math.NaN()},
+		{0, 0, math.NaN()},
+		{0, math.Inf(+1), 0},
+		{0, math.Inf(-1), 0},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Div(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
+				t.Errorf("Div() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -120,6 +275,24 @@ func TestSqrt(t *testing.T) {
 
 	if a.Cmp(b) != 0 {
 		t.Fatalf("got %v want %v", a, b)
+	}
+
+	tests := []struct {
+		arg  float64
+		want float64
+	}{
+		{0, 0},
+		{1, 1},
+		{-1, math.NaN()},
+		{math.Inf(1), math.Inf(1)},
+		{math.Inf(-1), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Sqrt(Float(tt.arg)); !same(got, Float(tt.want)) {
+				t.Errorf("Div() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -153,6 +326,10 @@ func TestPolynomial(t *testing.T) {
 	if d := math.Abs(SubFloat(got, want).y); d > 0.5e-5 {
 		t.Fatalf("got %.5f want %.5f", got.y, want)
 	}
+}
+
+func same(a, b Number) bool {
+	return a == b || IsNaN(a) && IsNaN(b)
 }
 
 func myBig() *big.Float {
