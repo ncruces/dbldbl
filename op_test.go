@@ -357,6 +357,31 @@ func TestSqrDivSqrt(t *testing.T) {
 	}
 }
 
+func TestCmp(t *testing.T) {
+	tests := []struct {
+		arg1 Number
+		arg2 Number
+		want int
+	}{
+		{Number{}, Number{}, 0},
+		{Number{+1, 0}, Number{}, +1},
+		{Number{-1, 0}, Number{}, -1},
+		{Number{1, +1}, Number{1, 0}, +1},
+		{Number{1, -1}, Number{1, 0}, -1},
+		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}, 0},
+		{Number{math.NaN(), 0}, Number{math.NaN(), 0}, 0},
+		{Number{}, Number{math.NaN(), 0}, +1},
+		{Number{math.NaN(), 0}, Number{}, -1},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Cmp(tt.arg1, tt.arg2); got != tt.want {
+				t.Errorf("Cmp() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestPolynomial(t *testing.T) {
 	poly := [...]float64{1, -78, 2717, -55770, 749463, -6926634,
 		44990231, -206070150, 657206836, -1414014888, 1931559552,

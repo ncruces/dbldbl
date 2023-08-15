@@ -183,6 +183,32 @@ func Sqrt(n Number) Number {
 	return twoSumQuick(y, x)
 }
 
+// Cmp compares x and y and returns:
+//
+//	-1 if x <  y (incl. NaN < !NaN)
+//	 0 if x == y (incl. -0 == 0, -Inf == -Inf, +Inf == +Inf, NaN == NaN)
+//	+1 if x >  y (incl. !NaN > NaN)
+func Cmp(a, b Number) int {
+	switch {
+	case a.y < b.y:
+		return -1
+	case a.y > b.y:
+		return +1
+	case a.x < b.x:
+		return -1
+	case a.x > b.x:
+		return +1
+	case a.y == b.y:
+		return 0
+	case !IsNaN(b):
+		return -1
+	case !IsNaN(a):
+		return +1
+	default:
+		return 0
+	}
+}
+
 func isFinite(x float64) bool {
 	return math.Float64bits(x)>>52&0x7ff != 0x7ff
 }
