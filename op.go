@@ -30,7 +30,33 @@ func IsInf(n Number, sign int) bool {
 
 // Trunc returns the integer value of n (exact).
 func Trunc(n Number) Number {
-	return Number{y: math.Trunc(n.y), x: math.Trunc(n.x)}
+	y := math.Trunc(n.y)
+	switch {
+	case y != n.y:
+		return Number{y: y}
+	case y < 0:
+		return Number{y: y, x: math.Ceil(n.x)}
+	default:
+		return Number{y: y, x: math.Floor(n.x)}
+	}
+}
+
+// Floor returns the greatest integer value less than or equal to n (exact).
+func Floor(n Number) Number {
+	y := math.Floor(n.y)
+	if y != n.y {
+		return Number{y: y}
+	}
+	return Number{y: y, x: math.Floor(n.x)}
+}
+
+// Ceil returns the least integer value greater than or equal to n (exact).
+func Ceil(n Number) Number {
+	y := math.Ceil(n.y)
+	if y != n.y {
+		return Number{y: y}
+	}
+	return Number{y: y, x: math.Ceil(n.x)}
 }
 
 // Shift returns the product of n by 2ⁱ, for −1023 < i ≤ +1023 (exact).

@@ -79,7 +79,8 @@ func TestTrunc(t *testing.T) {
 		{Number{1, 0}, Number{1, 0}},
 		{Number{0.5, 0}, Number{0, 0}},
 		{Number{1.5, 0}, Number{1, 0}},
-		{Number{1.5, 0.5}, Number{1, 0}},
+		{Number{10, -1.5}, Number{10, -2}},
+		{Number{-10, 1.5}, Number{-10, 2}},
 		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}},
 		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
 	}
@@ -87,6 +88,52 @@ func TestTrunc(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			if got := Trunc(tt.arg); !same(got, tt.want) {
 				t.Errorf("Trunc() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloor(t *testing.T) {
+	tests := []struct {
+		arg  Number
+		want Number
+	}{
+		{Number{}, Number{}},
+		{Number{1, 0}, Number{1, 0}},
+		{Number{0.5, 0}, Number{0, 0}},
+		{Number{1.5, 0}, Number{1, 0}},
+		{Number{10, -1.5}, Number{10, -2}},
+		{Number{-10, 1.5}, Number{-10, 1}},
+		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}},
+		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Floor(tt.arg); !same(got, tt.want) {
+				t.Errorf("Floor() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCeil(t *testing.T) {
+	tests := []struct {
+		arg  Number
+		want Number
+	}{
+		{Number{}, Number{}},
+		{Number{1, 0}, Number{1, 0}},
+		{Number{0.5, 0}, Number{1, 0}},
+		{Number{1.5, 0}, Number{2, 0}},
+		{Number{10, -1.5}, Number{10, -1}},
+		{Number{-10, 1.5}, Number{-10, 2}},
+		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}},
+		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Ceil(tt.arg); !same(got, tt.want) {
+				t.Errorf("Ceil() = %v, want %v", got, tt.want)
 			}
 		})
 	}
