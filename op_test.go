@@ -142,7 +142,7 @@ func TestCeil(t *testing.T) {
 func TestShift(t *testing.T) {
 	tests := []struct {
 		arg  Number
-		exp  int16
+		exp  int8
 		want Number
 	}{
 		{Number{}, +1, Number{}},
@@ -150,6 +150,8 @@ func TestShift(t *testing.T) {
 		{Number{1, 0}, +1, Number{2, 0}},
 		{Number{1, 0}, -1, Number{0.5, 0}},
 		{Number{-1, 0.5}, 1, Number{-2, 1}},
+		{Number{1, 0}, +127, Number{0x1p+127, 0}},
+		{Number{1, 0}, -128, Number{0x1p-128, 0}},
 		{Number{math.Inf(1), 0}, +1, Number{math.Inf(1), 0}},
 		{Number{math.Inf(1), 0}, -1, Number{math.Inf(1), 0}},
 		{Number{math.NaN(), 0}, +1, Number{math.NaN(), 0}},

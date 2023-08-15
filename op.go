@@ -59,9 +59,9 @@ func Ceil(n Number) Number {
 	return Number{y: y, x: math.Ceil(n.x)}
 }
 
-// Shift returns the product of n by 2ⁱ, for −1023 < i ≤ +1023 (exact).
-func Shift(n Number, i int16) Number {
-	e := math.Float64frombits(uint64(1023+i) << 52)
+// Shift returns the product of n by 2ⁱ (exact).
+func Shift(n Number, i int8) Number {
+	e := math.Float64frombits((1023 + uint64(i)) << 52)
 	return Number{y: e * n.y, x: e * n.x}
 }
 
