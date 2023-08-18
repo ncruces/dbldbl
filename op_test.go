@@ -188,6 +188,7 @@ func TestAdd(t *testing.T) {
 		{math.Inf(-1), math.Inf(+1), math.NaN()},
 		{math.NaN(), 0, math.NaN()},
 		{0, math.NaN(), math.NaN()},
+		{math.MaxFloat64, math.MaxFloat64, math.Inf(+1)},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -201,6 +202,12 @@ func TestAdd(t *testing.T) {
 				t.Errorf("Add() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	max := Number{math.MaxFloat64 / 2, math.MaxFloat64 / 2 * 0x1p-54}
+	if got := Add(max, max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Add() = %v", got)
 	}
 }
 
@@ -226,6 +233,7 @@ func TestSub(t *testing.T) {
 		{math.Inf(-1), math.Inf(+1), math.Inf(-1)},
 		{math.NaN(), 0, math.NaN()},
 		{0, math.NaN(), math.NaN()},
+		{-math.MaxFloat64, math.MaxFloat64, math.Inf(-1)},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -240,13 +248,19 @@ func TestSub(t *testing.T) {
 			}
 		})
 	}
+
+	// Ensure no underflow.
+	max := Number{math.MaxFloat64 / 2, math.MaxFloat64 / 2 * 0x1p-54}
+	if got := Sub(Neg(max), max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Sub() = %v", got)
+	}
 }
 
 func TestMul(t *testing.T) {
 	want := Mul(Float(math.E), Float(math.Pi))
 	got := MulFloats(math.E, math.Pi)
 	if !same(got, want) {
-		t.Errorf("SubFloats() = %v, want %v", got, want)
+		t.Errorf("MulFloats() = %v, want %v", got, want)
 	}
 
 	tests := []struct {
@@ -268,6 +282,7 @@ func TestMul(t *testing.T) {
 		{0, math.Inf(-1), math.NaN()},
 		{math.NaN(), 0, math.NaN()},
 		{0, math.NaN(), math.NaN()},
+		{math.MaxFloat64, -math.MaxFloat64, math.Inf(-1)},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -281,6 +296,12 @@ func TestMul(t *testing.T) {
 				t.Errorf("Mul() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	max := Number{math.Sqrt(math.MaxFloat64), math.Sqrt(math.MaxFloat64) * 0x1p-54}
+	if got := Mul(max, max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Mul() = %v", got)
 	}
 }
 
@@ -303,6 +324,7 @@ func TestDiv(t *testing.T) {
 		{0, 0, math.NaN()},
 		{0, math.Inf(+1), 0},
 		{0, math.Inf(-1), 0},
+		{1, -math.SmallestNonzeroFloat64, math.Inf(-1)},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -311,19 +333,52 @@ func TestDiv(t *testing.T) {
 			}
 		})
 	}
+
+	// Ensure no overflow.
+	max := Number{math.Sqrt(math.MaxFloat64), math.Sqrt(math.MaxFloat64) * 0x1p-54}
+	if got := Div(max, Div(Float(1), max)); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Div() = %v", got)
+	}
+}
+
+func TestSqr(t *testing.T) {
+	tests := []struct {
+		arg  float64
+		want float64
+	}{
+		{0, 0},
+		{1, 1},
+		{-1, 1},
+		{math.Inf(1), math.Inf(1)},
+		{math.Inf(-1), math.Inf(+1)},
+		{math.NaN(), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Sqr(Float(tt.arg)); !same(got, Float(tt.want)) {
+				t.Errorf("Sqr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+
+	// Ensure no overflow.
+	max := Number{math.Sqrt(math.MaxFloat64), math.Sqrt(math.MaxFloat64) * 0x1p-54}
+	if got := Sqr(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Sqr() = %v", got)
+	}
 }
 
 func TestSqrt(t *testing.T) {
 	got := Sqrt(Float(2))
 	if got.y != math.Sqrt2 {
-		t.Fatalf("got %v want %v", got.y, math.Sqrt2)
+		t.Fatalf("Sqrt() = %v, want %v", got.y, math.Sqrt2)
 	}
 
 	a := toBig(got)
 	b := myBig().Sqrt(big.NewFloat(2))
 
 	if a.Cmp(b) != 0 {
-		t.Fatalf("got %v want %v", a, b)
+		t.Fatalf("Sqrt() = %v, want %v", a, b)
 	}
 
 	tests := []struct {
@@ -335,11 +390,12 @@ func TestSqrt(t *testing.T) {
 		{-1, math.NaN()},
 		{math.Inf(1), math.Inf(1)},
 		{math.Inf(-1), math.NaN()},
+		{math.NaN(), math.NaN()},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Sqrt(Float(tt.arg)); !same(got, Float(tt.want)) {
-				t.Errorf("Div() = %v, want %v", got, tt.want)
+				t.Errorf("Sqrt() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -347,15 +403,8 @@ func TestSqrt(t *testing.T) {
 
 func TestSqrDivSqrt(t *testing.T) {
 	got := Sqr(Div(Float(1), Sqrt(Float(2))))
-	if got.y != 0.5 {
-		t.Fatalf("got %v want %v", got.y, math.Sqrt2)
-	}
-
-	a := toBig(got)
-	b := big.NewFloat(0.5)
-
-	if a.Cmp(b) != 0 {
-		t.Fatalf("got %v want %v", a, b)
+	if got != Float(0.5) { // (1/√2)² = 0.5
+		t.Fatalf("got %v", got)
 	}
 }
 

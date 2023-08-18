@@ -169,7 +169,13 @@ func Div(a, b Number) Number {
 
 // Sqr returns the square of n (approximate).
 func Sqr(n Number) Number {
-	return Mul(n, n)
+	s := twoProd(n.y, n.y)
+	if !isFinite(s.y) {
+		return Number{y: s.y}
+	}
+	s.x = math.FMA(n.x, n.x, s.x)
+	s.x = math.FMA(n.y, n.x+n.x, s.x)
+	return twoSumQuick(s.y, s.x)
 }
 
 // Sqrt returns the square root of n (approximate).
