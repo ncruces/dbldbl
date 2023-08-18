@@ -184,9 +184,22 @@ func Sqrt(n Number) Number {
 	if y == 0 || !isFinite(y) {
 		return Number{y: y}
 	}
+	// Newton's method: y + (n-y²)/2y
 	t := twoProd(y, y)
 	x := (n.y - t.y - t.x + n.x) * 0.5 / y
 	return twoSumQuick(y, x)
+}
+
+// Cbrt returns the cube root of n (approximate).
+func Cbrt(n Number) Number {
+	y := math.Cbrt(n.y)
+	if y == 0 || !isFinite(y) {
+		return Number{y: y}
+	}
+	// Newton's method: y + (n/y²-y)/3
+	t := Div(n, twoProd(y, y))
+	x := twoDiff(t.y, y)
+	return twoSumQuick(y, (x.y+x.x+t.x)/3)
 }
 
 // Cmp compares x and y and returns:

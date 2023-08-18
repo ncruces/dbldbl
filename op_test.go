@@ -2,11 +2,8 @@ package dbldbl
 
 import (
 	"math"
-	"math/big"
 	"testing"
 )
-
-const prec = 104
 
 func TestNeg(t *testing.T) {
 	tests := []struct {
@@ -374,11 +371,8 @@ func TestSqrt(t *testing.T) {
 		t.Fatalf("Sqrt() = %v, want %v", got.y, math.Sqrt2)
 	}
 
-	a := toBig(got)
-	b := myBig().Sqrt(big.NewFloat(2))
-
-	if a.Cmp(b) != 0 {
-		t.Fatalf("Sqrt() = %v, want %v", a, b)
+	if res := Sqr(got); res.y != 2 || res.x != 0 {
+		t.Fatalf("Sqrt() = %v, want %v", res, 2)
 	}
 
 	tests := []struct {
@@ -396,6 +390,36 @@ func TestSqrt(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			if got := Sqrt(Float(tt.arg)); !same(got, Float(tt.want)) {
 				t.Errorf("Sqrt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCbrt(t *testing.T) {
+	got := Cbrt(Float(-3))
+	if got.y != math.Cbrt(-3) {
+		t.Fatalf("Cbrt() = %v, want %v", got.y, math.Cbrt(-3))
+	}
+
+	if res := Mul(got, Sqr(got)); res.y != -3 || math.Abs(res.x) > 0x1p-104 {
+		t.Fatalf("Cbrt() = %v, want %v", res, -3)
+	}
+
+	tests := []struct {
+		arg  float64
+		want float64
+	}{
+		{0, 0},
+		{1, 1},
+		{-1, -1},
+		{math.Inf(1), math.Inf(1)},
+		{math.Inf(-1), math.Inf(-1)},
+		{math.NaN(), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Cbrt(Float(tt.arg)); !same(got, Float(tt.want)) {
+				t.Errorf("Cbrt() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -453,12 +477,4 @@ func TestPolynomial(t *testing.T) {
 
 func same(a, b Number) bool {
 	return a == b || IsNaN(a) && IsNaN(b)
-}
-
-func myBig() *big.Float {
-	return new(big.Float).SetPrec(prec)
-}
-
-func toBig(n Number) *big.Float {
-	return myBig().Add(big.NewFloat(n.y), big.NewFloat(n.x))
 }
