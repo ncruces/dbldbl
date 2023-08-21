@@ -1,5 +1,8 @@
 package dbldbl
 
+import "math"
+
+// Log returns the natural logarithm of n (approximate).
 func Log(n Number) Number {
 	switch {
 	case n.y < 0:
@@ -31,6 +34,17 @@ func Log(n Number) Number {
 		n = Neg(n)
 	}
 	return n
+}
+
+// Exp returns eⁿ, the base-e exponential of n (approximate).
+func Exp(n Number) Number {
+	y := math.Exp(n.y)
+	if y == 0 || !isFinite(y) {
+		return Number{y: y}
+	}
+	// Newton's method: y + (n-log(y))⋅y
+	t := Sub(n, Log(Float(y)))
+	return twoSumQuick(y, t.y*y)
 }
 
 func agm(a, g Number) Number {
