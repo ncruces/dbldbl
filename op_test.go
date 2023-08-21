@@ -33,9 +33,8 @@ func TestAbs(t *testing.T) {
 		{Number{-1, 0}, Number{1, 0}},
 		{Number{+1, 0.5}, Number{1, +0.5}},
 		{Number{-1, 0.5}, Number{1, -0.5}},
-		{Number{math.Inf(+1), 0}, Number{math.Inf(1), 0}},
-		{Number{math.Inf(-1), 0}, Number{math.Inf(1), 0}},
-		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
+		{Inf(-1), Number{math.Inf(1), 0}},
+		{NaN(), Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -54,9 +53,9 @@ func TestIsInf(t *testing.T) {
 		{Number{}, false},
 		{Number{+1, 0}, false},
 		{Number{-1, 0}, false},
-		{Number{math.Inf(+1), 0}, true},
-		{Number{math.Inf(-1), 0}, true},
-		{Number{math.NaN(), 0}, false},
+		{Inf(+1), true},
+		{Inf(-1), true},
+		{NaN(), false},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -78,8 +77,8 @@ func TestTrunc(t *testing.T) {
 		{Number{1.5, 0}, Number{1, 0}},
 		{Number{10, -1.5}, Number{10, -2}},
 		{Number{-10, 1.5}, Number{-10, 2}},
-		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}},
-		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
+		{Inf(1), Number{math.Inf(1), 0}},
+		{NaN(), Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -101,8 +100,8 @@ func TestFloor(t *testing.T) {
 		{Number{1.5, 0}, Number{1, 0}},
 		{Number{10, -1.5}, Number{10, -2}},
 		{Number{-10, 1.5}, Number{-10, 1}},
-		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}},
-		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
+		{Inf(1), Number{math.Inf(1), 0}},
+		{NaN(), Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -124,8 +123,8 @@ func TestCeil(t *testing.T) {
 		{Number{1.5, 0}, Number{2, 0}},
 		{Number{10, -1.5}, Number{10, -1}},
 		{Number{-10, 1.5}, Number{-10, 2}},
-		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}},
-		{Number{math.NaN(), 0}, Number{math.NaN(), 0}},
+		{Inf(1), Number{math.Inf(1), 0}},
+		{NaN(), Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -149,10 +148,10 @@ func TestShift(t *testing.T) {
 		{Number{-1, 0.5}, 1, Number{-2, 1}},
 		{Number{1, 0}, +127, Number{0x1p+127, 0}},
 		{Number{1, 0}, -128, Number{0x1p-128, 0}},
-		{Number{math.Inf(1), 0}, +1, Number{math.Inf(1), 0}},
-		{Number{math.Inf(1), 0}, -1, Number{math.Inf(1), 0}},
-		{Number{math.NaN(), 0}, +1, Number{math.NaN(), 0}},
-		{Number{math.NaN(), 0}, -1, Number{math.NaN(), 0}},
+		{Inf(1), +1, Number{math.Inf(1), 0}},
+		{Inf(1), -1, Number{math.Inf(1), 0}},
+		{NaN(), +1, Number{math.NaN(), 0}},
+		{NaN(), -1, Number{math.NaN(), 0}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -443,10 +442,10 @@ func TestCmp(t *testing.T) {
 		{Number{-1, 0}, Number{}, -1},
 		{Number{1, +1}, Number{1, 0}, +1},
 		{Number{1, -1}, Number{1, 0}, -1},
-		{Number{math.Inf(1), 0}, Number{math.Inf(1), 0}, 0},
-		{Number{math.NaN(), 0}, Number{math.NaN(), 0}, 0},
 		{Number{}, Number{math.NaN(), 0}, +1},
-		{Number{math.NaN(), 0}, Number{}, -1},
+		{Inf(1), Number{math.Inf(1), 0}, 0},
+		{NaN(), Number{math.NaN(), 0}, 0},
+		{NaN(), Number{}, -1},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
