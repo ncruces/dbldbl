@@ -27,7 +27,7 @@ func Log(n Number) Number {
 		shift--
 	}
 
-	// log(1/x) = π / 2⋅AGM(1, 4⋅x)
+	// log(1/n) = π / 2⋅AGM(1, 4⋅n)
 	n = Div(Pi, agm(Float(1), Shift(n, 2)))
 	n = Shift(n, shift-1)
 	if negate {
@@ -42,9 +42,9 @@ func Exp(n Number) Number {
 	if y == 0 || !isFinite(y) {
 		return Number{y: y}
 	}
-	// Newton's method: y + (n-log(y))⋅y
+	// Newton's method: y + y⋅(n-log(y))
 	t := Sub(n, Log(Float(y)))
-	return twoSumQuick(y, t.y*y)
+	return twoSumQuick(y, y*t.y)
 }
 
 func agm(a, g Number) Number {

@@ -2,7 +2,7 @@ package dbldbl
 
 import "math"
 
-// Neg negates a Number (exact).
+// Neg negates n (exact).
 func Neg(n Number) Number {
 	return Number{y: -n.y, x: -n.x}
 }
@@ -198,8 +198,7 @@ func Cbrt(n Number) Number {
 	}
 	// Newton's method: y + (n/y²-y)/3
 	t := Div(n, twoProd(y, y))
-	x := twoDiff(t.y, y)
-	return twoSumQuick(y, (x.y+x.x+t.x)/3)
+	return twoSumQuick(y, (t.y-y+t.x)/3)
 }
 
 // Cmp compares x and y and returns:
