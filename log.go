@@ -32,17 +32,21 @@ func Log(n Number) Number {
 }
 
 func log(n Number) Number {
+	// Sasaki and Kanada's formula, with q=q⁴
+	// to avoid the ∜q̅ term in the θ₂(q) expansion:
+	// https://maths-people.anu.edu.au/~brent/pd/RNC7t.pdf
 	q := Div(Float(1), n)
 	q4 := Sqr(Sqr(q))
 	q8 := Sqr(q4)
 	q16 := Sqr(q8)
 	q24 := Mul(q16, q8)
-	th2 := Shift(Mul(q, AddFloat(Add(q24, q8), 1)), 1)
+	th2 := Shift(Mul(q, AddFloat(Add(q8, q24), 1)), 1)
 	th3 := AddFloat(Shift(Add(q4, q16), 1), 1)
 	return Div(Shift(Pi, -2), agm(Sqr(th2), Sqr(th3)))
 }
 
 func agm(a, g Number) Number {
+	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean
 	for {
 		t := Shift(Add(a, g), -1)
 		if a == t {
@@ -54,6 +58,7 @@ func agm(a, g Number) Number {
 }
 
 func pi() Number {
+	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean
 	a := Float(1)
 	g := Sqrt(Float(0.5))
 	series := Float(1)

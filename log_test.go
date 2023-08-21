@@ -49,7 +49,6 @@ func TestLog_specials(t *testing.T) {
 }
 
 func Test_agm(t *testing.T) {
-	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean
 	got := agm(Float(24), Float(6))
 	want := "13.4581714817256154207668131569743992430538388544"
 	if !strings.HasPrefix(want, fmt.Sprint(got)[:30]) {
