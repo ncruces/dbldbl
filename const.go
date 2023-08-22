@@ -2,10 +2,12 @@ package dbldbl
 
 import "math"
 
+// NaN returns a “not-a-number” value.
 func NaN() Number {
 	return Number{y: math.NaN()}
 }
 
+// Inf returns positive infinity if sign >= 0, negative infinity if sign < 0.
 func Inf(sign int) Number {
 	return Number{y: math.Inf(sign)}
 }
