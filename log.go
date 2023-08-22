@@ -87,24 +87,8 @@ func agm(a, g Number) Number {
 		}
 		g = Sqrt(Mul(a, g))
 		a = t
-	}
-}
-
-func pi() Number {
-	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean
-	a := Float(1)
-	g := Sqrt(Float(0.5))
-	series := Float(1)
-
-	for n := int8(1); n < 127; n++ {
-		t := Shift(Add(a, g), -1)
-		if a == t {
-			break
+		if a == g {
+			return a
 		}
-		g = Sqrt(Mul(a, g))
-		a = t
-		series = Sub(series, Shift(Sub(Sqr(a), Sqr(g)), n+1))
 	}
-
-	return Shift(Div(Sqr(a), series), 2)
 }

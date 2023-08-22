@@ -158,11 +158,3 @@ func Test_agm(t *testing.T) {
 		t.Errorf("agm = %v, want %v", got, want)
 	}
 }
-
-func Test_pi(t *testing.T) {
-	got := pi()
-	want := "3.14159265358979323846264338327950288419716939937510582097494459"
-	if !strings.HasPrefix(want, fmt.Sprint(got)[:30]) {
-		t.Errorf("agm = %v, want %v", got, want)
-	}
-}
