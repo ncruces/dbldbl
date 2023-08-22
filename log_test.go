@@ -43,7 +43,7 @@ func TestLog_specials(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Log(tt.arg); !same(got, tt.want) {
-				t.Errorf("Log() = %v, want %v", got, tt.want)
+				t.Errorf("Log() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -83,7 +83,7 @@ func TestExp_specials(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Exp(tt.arg); !same(got, tt.want) {
-				t.Errorf("Exp() = %v, want %v", got, tt.want)
+				t.Errorf("Exp() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}

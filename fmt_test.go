@@ -18,7 +18,7 @@ func TestNumber_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.arg.String(); got != tt.want {
-				t.Errorf("Number.String() = %v, want %v", got, tt.want)
+				t.Errorf("Number.String() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -36,7 +36,7 @@ func TestNumber_GoString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.arg.GoString(); got != tt.want {
-				t.Errorf("Number.GoString() = %v, want %v", got, tt.want)
+				t.Errorf("Number.GoString() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -45,6 +45,8 @@ func TestNumber_GoString(t *testing.T) {
 func (n Number) Format(f fmt.State, verb rune) {
 	if verb == 'v' && f.Flag('#') {
 		fmt.Fprintf(f, "Number{%v, %v}", n.y, n.x)
+	} else if IsNaN(n) {
+		f.Write([]byte("NaN"))
 	} else {
 		n.toBig().Format(f, verb)
 	}

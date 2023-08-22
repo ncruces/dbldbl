@@ -2,12 +2,9 @@ package dbldbl
 
 import (
 	"fmt"
-	"math"
 	"strings"
 	"testing"
 )
-
-var negZero = Float(math.Copysign(0, -1))
 
 func TestPow(t *testing.T) {
 	tests := []struct {
@@ -36,8 +33,8 @@ func TestPow_specials(t *testing.T) {
 		want Number
 	}{
 		{Inf(-1), Neg(Pi), Number{}},
-		{Inf(-1), Float(-3), Number{}},
-		{Inf(-1), negZero, Float(1)},
+		{Inf(-1), Float(-3), Float(-zero)},
+		{Inf(-1), Float(-zero), Float(1)},
 		{Inf(-1), Number{}, Float(1)},
 		{Inf(-1), Float(1), Inf(-1)},
 		{Inf(-1), Float(3), Inf(-1)},
@@ -46,7 +43,7 @@ func TestPow_specials(t *testing.T) {
 		{Inf(-1), NaN(), NaN()},
 		{Neg(Pi), Inf(-1), Number{}},
 		{Neg(Pi), Neg(Pi), NaN()},
-		{Neg(Pi), negZero, Float(1)},
+		{Neg(Pi), Float(-zero), Float(1)},
 		{Neg(Pi), Number{}, Float(1)},
 		{Neg(Pi), Float(1), Neg(Pi)},
 		{Neg(Pi), Pi, NaN()},
@@ -57,18 +54,18 @@ func TestPow_specials(t *testing.T) {
 		{Float(-1), NaN(), NaN()},
 		{Float(-0.5), Inf(-1), Inf(1)},
 		{Float(-0.5), Inf(1), Number{}},
-		{negZero, Inf(-1), Inf(1)},
-		{negZero, Neg(Pi), Inf(1)},
-		{negZero, Float(-0.5), Inf(1)},
-		{negZero, Float(-3), Inf(-1)},
-		{negZero, Float(3), negZero},
-		{negZero, Pi, Number{}},
-		{negZero, Float(0.5), Number{}},
-		{negZero, Inf(1), Number{}},
+		{Float(-zero), Inf(-1), Inf(1)},
+		{Float(-zero), Neg(Pi), Inf(1)},
+		{Float(-zero), Float(-0.5), Inf(1)},
+		{Float(-zero), Float(-3), Inf(-1)},
+		{Float(-zero), Float(3), Float(-zero)},
+		{Float(-zero), Pi, Number{}},
+		{Float(-zero), Float(0.5), Number{}},
+		{Float(-zero), Inf(1), Number{}},
 		{Number{}, Inf(-1), Inf(1)},
 		{Number{}, Neg(Pi), Inf(1)},
 		{Number{}, Float(-3), Inf(1)},
-		{Number{}, negZero, Float(1)},
+		{Number{}, Float(-zero), Float(1)},
 		{Number{}, Number{}, Float(1)},
 		{Number{}, Float(3), Number{}},
 		{Number{}, Pi, Number{}},
@@ -80,19 +77,19 @@ func TestPow_specials(t *testing.T) {
 		{Float(1), Inf(1), Float(1)},
 		{Float(1), NaN(), Float(1)},
 		{Pi, Inf(-1), Number{}},
-		{Pi, negZero, Float(1)},
+		{Pi, Float(-zero), Float(1)},
 		{Pi, Number{}, Float(1)},
 		{Pi, Float(1), Pi},
 		{Pi, Inf(1), Inf(1)},
 		{Pi, NaN(), NaN()},
 		{Inf(1), Neg(Pi), Number{}},
-		{Inf(1), negZero, Float(1)},
+		{Inf(1), Float(-zero), Float(1)},
 		{Inf(1), Number{}, Float(1)},
 		{Inf(1), Float(1), Inf(1)},
 		{Inf(1), Pi, Inf(1)},
 		{Inf(1), NaN(), NaN()},
 		{NaN(), Neg(Pi), NaN()},
-		{NaN(), negZero, Float(1)},
+		{NaN(), Float(-zero), Float(1)},
 		{NaN(), Number{}, Float(1)},
 		{NaN(), Float(1), NaN()},
 		{NaN(), Pi, NaN()},
@@ -107,7 +104,7 @@ func TestPow_specials(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Pow(tt.arg0, tt.arg1); !same(got, tt.want) {
-				t.Errorf("Pow() = %v, want %v", got, tt.want)
+				t.Errorf("Pow() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}

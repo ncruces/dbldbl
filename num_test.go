@@ -1,7 +1,7 @@
 package dbldbl
 
 import (
-	"reflect"
+	"math"
 	"testing"
 )
 
@@ -20,13 +20,13 @@ func TestInt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if tt.arg != tt.want.Int() {
-				t.Errorf("arg = %v, want %v", tt.arg, tt.want)
+				t.Errorf("arg = %#v, want %#v", tt.arg, tt.want)
 			}
-			if got := Int(tt.arg); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Int() = %v, want %v", got, tt.want)
+			if got := Int(tt.arg); !same(got, tt.want) {
+				t.Errorf("Int() = %#v, want %#v", got, tt.want)
 			}
-			if f, ok := tt.want.Float(); ok != reflect.DeepEqual(Float(f), tt.want) {
-				t.Errorf("float = %v, want %v", f, tt.want)
+			if f, ok := tt.want.Float(); ok != same(Float(f), tt.want) {
+				t.Errorf("float = %#v, want %#v", f, tt.want)
 			}
 		})
 	}
@@ -47,14 +47,23 @@ func TestUint(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if tt.arg != tt.want.Uint() {
-				t.Errorf("arg = %v, want %v", tt.arg, tt.want)
+				t.Errorf("arg = %#v, want %#v", tt.arg, tt.want)
 			}
-			if got := Uint(tt.arg); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Int() = %v, want %v", got, tt.want)
+			if got := Uint(tt.arg); !same(got, tt.want) {
+				t.Errorf("Int() = %#v, want %#v", got, tt.want)
 			}
-			if f, ok := tt.want.Float(); ok != reflect.DeepEqual(Float(f), tt.want) {
-				t.Errorf("float = %v, want %v", f, tt.want)
+			if f, ok := tt.want.Float(); ok != same(Float(f), tt.want) {
+				t.Errorf("float = %#v, want %#v", f, tt.want)
 			}
 		})
 	}
+}
+
+var zero = 0.0
+
+func same(a, b Number) bool {
+	return IsNaN(a) && IsNaN(b) ||
+		math.Float64bits(a.y) == math.Float64bits(b.y) &&
+			math.Float64bits(a.x) == math.Float64bits(b.x)
+
 }

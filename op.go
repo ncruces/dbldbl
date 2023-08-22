@@ -4,7 +4,7 @@ import "math"
 
 // Neg negates n (exact).
 func Neg(n Number) Number {
-	return Number{y: -n.y, x: -n.x}
+	return Number{y: -n.y, x: 0 - n.x}
 }
 
 // Abs returns the absolute value of n (exact).

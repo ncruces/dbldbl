@@ -10,14 +10,14 @@ func TestNeg(t *testing.T) {
 		arg  Number
 		want Number
 	}{
-		{Number{}, Number{}},
-		{Float(1), Number{-1, -0}},
-		{Number{0, 1}, Number{-0, -1}},
+		{Number{}, Number{-zero, 0}},
+		{Float(1), Number{-1, 0}},
+		{Number{1, 0.5}, Number{-1, -0.5}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Neg(tt.arg); !same(got, tt.want) {
-				t.Errorf("Neg() = %v, want %v", got, tt.want)
+				t.Errorf("Neg() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -39,7 +39,7 @@ func TestAbs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Abs(tt.arg); !same(got, tt.want) {
-				t.Errorf("Abs() = %v, want %v", got, tt.want)
+				t.Errorf("Abs() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -60,7 +60,7 @@ func TestIsInf(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := IsInf(tt.arg, 0); got != tt.want {
-				t.Errorf("IsInf() = %v, want %v", got, tt.want)
+				t.Errorf("IsInf() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -83,7 +83,7 @@ func TestTrunc(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Trunc(tt.arg); !same(got, tt.want) {
-				t.Errorf("Trunc() = %v, want %v", got, tt.want)
+				t.Errorf("Trunc() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -106,7 +106,7 @@ func TestFloor(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Floor(tt.arg); !same(got, tt.want) {
-				t.Errorf("Floor() = %v, want %v", got, tt.want)
+				t.Errorf("Floor() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -129,7 +129,7 @@ func TestCeil(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Ceil(tt.arg); !same(got, tt.want) {
-				t.Errorf("Ceil() = %v, want %v", got, tt.want)
+				t.Errorf("Ceil() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -156,7 +156,7 @@ func TestShift(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Shift(tt.arg, tt.exp); !same(got, tt.want) {
-				t.Errorf("Shift() = %v, want %v", got, tt.want)
+				t.Errorf("Shift() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -166,7 +166,7 @@ func TestAdd(t *testing.T) {
 	want := Add(Float(math.E), Float(math.Pi))
 	got := AddFloats(math.E, math.Pi)
 	if !same(got, want) {
-		t.Errorf("AddFloats() = %v, want %v", got, want)
+		t.Errorf("AddFloats() = %#v, want %#v", got, want)
 	}
 
 	tests := []struct {
@@ -189,13 +189,13 @@ func TestAdd(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := AddFloats(tt.arg1, tt.arg2); !same(got, Float(tt.want)) {
-				t.Errorf("AddFloats() = %v, want %v", got, tt.want)
+				t.Errorf("AddFloats() = %#v, want %#v", got, tt.want)
 			}
 			if got := AddFloat(Float(tt.arg1), tt.arg2); !same(got, Float(tt.want)) {
-				t.Errorf("AddFloat() = %v, want %v", got, tt.want)
+				t.Errorf("AddFloat() = %#v, want %#v", got, tt.want)
 			}
 			if got := Add(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
-				t.Errorf("Add() = %v, want %v", got, tt.want)
+				t.Errorf("Add() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -203,7 +203,7 @@ func TestAdd(t *testing.T) {
 	// Ensure no overflow.
 	max := Number{math.MaxFloat64 / 2, math.MaxFloat64 / 2 * 0x1p-54}
 	if got := Add(max, max); !isFinite(got.y) || !isFinite(got.x) {
-		t.Errorf("Add() = %v", got)
+		t.Errorf("Add() = %#v", got)
 	}
 }
 
@@ -211,7 +211,7 @@ func TestSub(t *testing.T) {
 	want := Sub(Float(math.E), Float(math.Pi))
 	got := SubFloats(math.E, math.Pi)
 	if !same(got, want) {
-		t.Errorf("SubFloats() = %v, want %v", got, want)
+		t.Errorf("SubFloats() = %#v, want %#v", got, want)
 	}
 
 	tests := []struct {
@@ -234,13 +234,13 @@ func TestSub(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := SubFloats(tt.arg1, tt.arg2); !same(got, Float(tt.want)) {
-				t.Errorf("SubFloats() = %v, want %v", got, tt.want)
+				t.Errorf("SubFloats() = %#v, want %#v", got, tt.want)
 			}
 			if got := SubFloat(Float(tt.arg1), tt.arg2); !same(got, Float(tt.want)) {
-				t.Errorf("SubFloat() = %v, want %v", got, tt.want)
+				t.Errorf("SubFloat() = %#v, want %#v", got, tt.want)
 			}
 			if got := Sub(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
-				t.Errorf("Sub() = %v, want %v", got, tt.want)
+				t.Errorf("Sub() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -248,7 +248,7 @@ func TestSub(t *testing.T) {
 	// Ensure no underflow.
 	max := Number{math.MaxFloat64 / 2, math.MaxFloat64 / 2 * 0x1p-54}
 	if got := Sub(Neg(max), max); !isFinite(got.y) || !isFinite(got.x) {
-		t.Errorf("Sub() = %v", got)
+		t.Errorf("Sub() = %#v", got)
 	}
 }
 
@@ -256,7 +256,7 @@ func TestMul(t *testing.T) {
 	want := Mul(Float(math.E), Float(math.Pi))
 	got := MulFloats(math.E, math.Pi)
 	if !same(got, want) {
-		t.Errorf("MulFloats() = %v, want %v", got, want)
+		t.Errorf("MulFloats() = %#v, want %#v", got, want)
 	}
 
 	tests := []struct {
@@ -283,13 +283,13 @@ func TestMul(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := MulFloats(tt.arg1, tt.arg2); !same(got, Float(tt.want)) {
-				t.Errorf("MulFloats() = %v, want %v", got, tt.want)
+				t.Errorf("MulFloats() = %#v, want %#v", got, tt.want)
 			}
 			if got := MulFloat(Float(tt.arg1), tt.arg2); !same(got, Float(tt.want)) {
-				t.Errorf("MulFloat() = %v, want %v", got, tt.want)
+				t.Errorf("MulFloat() = %#v, want %#v", got, tt.want)
 			}
 			if got := Mul(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
-				t.Errorf("Mul() = %v, want %v", got, tt.want)
+				t.Errorf("Mul() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -297,7 +297,7 @@ func TestMul(t *testing.T) {
 	// Ensure no overflow.
 	max := Number{math.Sqrt(math.MaxFloat64), math.Sqrt(math.MaxFloat64) * 0x1p-54}
 	if got := Mul(max, max); !isFinite(got.y) || !isFinite(got.x) {
-		t.Errorf("Mul() = %v", got)
+		t.Errorf("Mul() = %#v", got)
 	}
 }
 
@@ -319,13 +319,13 @@ func TestDiv(t *testing.T) {
 		{0, math.NaN(), math.NaN()},
 		{0, 0, math.NaN()},
 		{0, math.Inf(+1), 0},
-		{0, math.Inf(-1), 0},
+		{0, math.Inf(-1), -zero},
 		{1, -math.SmallestNonzeroFloat64, math.Inf(-1)},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Div(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
-				t.Errorf("Div() = %v, want %v", got, tt.want)
+				t.Errorf("Div() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -333,7 +333,7 @@ func TestDiv(t *testing.T) {
 	// Ensure no overflow.
 	max := Number{math.Sqrt(math.MaxFloat64), math.Sqrt(math.MaxFloat64) * 0x1p-54}
 	if got := Div(max, Div(Float(1), max)); !isFinite(got.y) || !isFinite(got.x) {
-		t.Errorf("Div() = %v", got)
+		t.Errorf("Div() = %#v", got)
 	}
 }
 
@@ -352,7 +352,7 @@ func TestSqr(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Sqr(Float(tt.arg)); !same(got, Float(tt.want)) {
-				t.Errorf("Sqr() = %v, want %v", got, tt.want)
+				t.Errorf("Sqr() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -360,18 +360,18 @@ func TestSqr(t *testing.T) {
 	// Ensure no overflow.
 	max := Number{math.Sqrt(math.MaxFloat64), math.Sqrt(math.MaxFloat64) * 0x1p-54}
 	if got := Sqr(max); !isFinite(got.y) || !isFinite(got.x) {
-		t.Errorf("Sqr() = %v", got)
+		t.Errorf("Sqr() = %#v", got)
 	}
 }
 
 func TestSqrt(t *testing.T) {
 	got := Sqrt(Float(2))
 	if got.y != math.Sqrt2 {
-		t.Fatalf("Sqrt() = %v, want %v", got.y, math.Sqrt2)
+		t.Fatalf("Sqrt() = %#v, want %#v", got.y, math.Sqrt2)
 	}
 
 	if res := Sqr(got); res.y != 2 || res.x != 0 {
-		t.Fatalf("Sqrt() = %v, want %v", res, 2)
+		t.Fatalf("Sqrt() = %#v, want %#v", res, 2)
 	}
 
 	tests := []struct {
@@ -388,7 +388,7 @@ func TestSqrt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Sqrt(Float(tt.arg)); !same(got, Float(tt.want)) {
-				t.Errorf("Sqrt() = %v, want %v", got, tt.want)
+				t.Errorf("Sqrt() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -397,11 +397,11 @@ func TestSqrt(t *testing.T) {
 func TestCbrt(t *testing.T) {
 	got := Cbrt(Float(-3))
 	if got.y != math.Cbrt(-3) {
-		t.Fatalf("Cbrt() = %v, want %v", got.y, math.Cbrt(-3))
+		t.Fatalf("Cbrt() = %#v, want %#v", got.y, math.Cbrt(-3))
 	}
 
 	if res := Mul(got, Sqr(got)); res.y != -3 || math.Abs(res.x) > 0x1p-104 {
-		t.Fatalf("Cbrt() = %v, want %v", res, -3)
+		t.Fatalf("Cbrt() = %#v, want %#v", res, -3)
 	}
 
 	tests := []struct {
@@ -418,7 +418,7 @@ func TestCbrt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Cbrt(Float(tt.arg)); !same(got, Float(tt.want)) {
-				t.Errorf("Cbrt() = %v, want %v", got, tt.want)
+				t.Errorf("Cbrt() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -427,7 +427,7 @@ func TestCbrt(t *testing.T) {
 func TestSqrDivSqrt(t *testing.T) {
 	got := Sqr(Div(Float(1), Sqrt(Float(2))))
 	if got != Float(0.5) { // (1/√2)² = 0.5
-		t.Fatalf("got %v", got)
+		t.Fatalf("got %#v", got)
 	}
 }
 
@@ -450,7 +450,7 @@ func TestCmp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Cmp(tt.arg1, tt.arg2); got != tt.want {
-				t.Errorf("Cmp() = %v, want %v", got, tt.want)
+				t.Errorf("Cmp() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -472,8 +472,4 @@ func TestPolynomial(t *testing.T) {
 	if d := math.Abs(SubFloat(got, want).y); d > 0.5e-5 {
 		t.Fatalf("got %.5f want %.5f", got.y, want)
 	}
-}
-
-func same(a, b Number) bool {
-	return a == b || IsNaN(a) && IsNaN(b)
 }
