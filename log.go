@@ -10,7 +10,7 @@ func Log(n Number) Number {
 	case n.y == 0:
 		return Inf(-1)
 	case n.y == 1:
-		return Number{y: n.x}
+		return Number{y: math.Log1p(n.x)}
 	case !isFinite(n.y):
 		return n
 	}
@@ -45,6 +45,37 @@ func Exp(n Number) Number {
 	// Newton's method: y + y⋅(n-log(y))
 	t := Sub(n, Log(Float(y)))
 	return twoSumQuick(y, y*t.y)
+}
+
+// Log1p returns the natural logarithm of 1 plus n (approximate).
+// It is more accurate than Log(AddFloat(n, 1)) when n is near zero.
+func Log1p(n Number) Number {
+	// https://www.johndcook.com/blog/2012/07/25/trick-for-computing-log1x/
+	u := AddFloat(n, 1)
+	switch {
+	case u.y < 0:
+		return NaN()
+	case u == Float(1):
+		return n
+	case !isFinite(u.y):
+		return n
+	}
+	return Div(Mul(n, Log(u)), SubFloat(u, 1))
+}
+
+// Expm1 returns eⁿ-1, the base-e exponential of n minus 1 (approximate).
+// It is more accurate than SubFloat(Exp(n), 1) when n is near zero.
+func Expm1(n Number) Number {
+	y := math.Expm1(n.y)
+	switch {
+	case y == 0 || !isFinite(y):
+		return Number{y: y}
+	case y == -1:
+		return SubFloat(Exp(n), 1)
+	}
+	// Newton's method: y + (y+1)⋅(n-log1p(y))
+	t := Sub(n, Log1p(Float(y)))
+	return twoSumQuick(y, (y+1)*t.y)
 }
 
 func agm(a, g Number) Number {

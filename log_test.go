@@ -58,7 +58,7 @@ func TestExp(t *testing.T) {
 		{Phi, "5.04316564336002865131188218928542471032359017541384636030200019"},      // https://oeis.org/A139341
 		{Float(1), "2.71828182845904523536028747135266249775724709369995957496696762"}, // https://oeis.org/A072334
 		{Float(2), "7.38905609893065022723042746057500781318031557055184732408712782"}, // https://oeis.org/A001113
-		{Float(2.7755575615628913510590791702e-17), "1.000000000000000027755575615628914"},
+		{Float(0x1p-55), "1.000000000000000027755575615628914"},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -84,6 +84,68 @@ func TestExp_specials(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			if got := Exp(tt.arg); !same(got, tt.want) {
 				t.Errorf("Exp() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLog1p_specials(t *testing.T) {
+	tests := []struct {
+		arg  Number
+		want Number
+	}{
+		{Float(0), Number{}},
+		{Float(-zero), Number{-zero, 0}},
+		{AddFloats(-1, -0x1p-55), Number{math.NaN(), 0}},
+		{Float(-1), Number{math.Inf(-1), 0}},
+		{Inf(1), Number{math.Inf(1), 0}},
+		{NaN(), Number{math.NaN(), 0}},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Log1p(tt.arg); !same(got, tt.want) {
+				t.Errorf("Log1p() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExpm1(t *testing.T) {
+	tests := []struct {
+		arg  Number
+		want string
+	}{
+		{Pi, "22.1406926327792690057290863679485473802661062426002119934450464"},       // https://oeis.org/A039661
+		{Phi, "4.04316564336002865131188218928542471032359017541384636030200019"},      // https://oeis.org/A139341
+		{Float(1), "1.71828182845904523536028747135266249775724709369995957496696762"}, // https://oeis.org/A072334
+		{Float(2), "6.38905609893065022723042746057500781318031557055184732408712782"}, // https://oeis.org/A001113
+		{Float(0x1p-55), "2.77555756156289135105907917022705e-17"},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Expm1(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+				t.Errorf("Expm1() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExpm1_specials(t *testing.T) {
+	tests := []struct {
+		arg  Number
+		want Number
+	}{
+		{Float(0), Number{}},
+		{Float(-zero), Number{-zero, 0}},
+		{Inf(+1), Number{math.Inf(1), 0}},
+		{Inf(-1), Number{-1, 0}},
+		{Float(-1024), Number{-1, 0}},
+		{NaN(), Number{math.NaN(), 0}},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Expm1(tt.arg); !same(got, tt.want) {
+				t.Errorf("Expm1() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
