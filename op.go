@@ -9,10 +9,10 @@ func Neg(n Number) Number {
 
 // Abs returns the absolute value of n (exact).
 func Abs(n Number) Number {
-	if n.y >= 0 {
-		return n
+	if math.Signbit(n.y) {
+		return Neg(n)
 	}
-	return Neg(n)
+	return n
 }
 
 // IsNaN reports whether n is a “not-a-number” value.

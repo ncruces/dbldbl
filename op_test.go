@@ -11,7 +11,7 @@ func TestNeg(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Number{1, 0}, Number{-1, -0}},
+		{Float(1), Number{-1, -0}},
 		{Number{0, 1}, Number{-0, -1}},
 	}
 	for _, tt := range tests {
@@ -29,8 +29,8 @@ func TestAbs(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Number{+1, 0}, Number{1, 0}},
-		{Number{-1, 0}, Number{1, 0}},
+		{Float(+1), Number{1, 0}},
+		{Float(-1), Number{1, 0}},
 		{Number{+1, 0.5}, Number{1, +0.5}},
 		{Number{-1, 0.5}, Number{1, -0.5}},
 		{Inf(-1), Number{math.Inf(1), 0}},
@@ -51,8 +51,8 @@ func TestIsInf(t *testing.T) {
 		want bool
 	}{
 		{Number{}, false},
-		{Number{+1, 0}, false},
-		{Number{-1, 0}, false},
+		{Float(+1), false},
+		{Float(-1), false},
 		{Inf(+1), true},
 		{Inf(-1), true},
 		{NaN(), false},
@@ -72,9 +72,9 @@ func TestTrunc(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Number{1, 0}, Number{1, 0}},
-		{Number{0.5, 0}, Number{0, 0}},
-		{Number{1.5, 0}, Number{1, 0}},
+		{Float(1), Number{1, 0}},
+		{Float(0.5), Number{0, 0}},
+		{Float(1.5), Number{1, 0}},
 		{Number{10, -1.5}, Number{10, -2}},
 		{Number{-10, 1.5}, Number{-10, 2}},
 		{Inf(1), Number{math.Inf(1), 0}},
@@ -95,9 +95,9 @@ func TestFloor(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Number{1, 0}, Number{1, 0}},
-		{Number{0.5, 0}, Number{0, 0}},
-		{Number{1.5, 0}, Number{1, 0}},
+		{Float(1), Number{1, 0}},
+		{Float(0.5), Number{0, 0}},
+		{Float(1.5), Number{1, 0}},
 		{Number{10, -1.5}, Number{10, -2}},
 		{Number{-10, 1.5}, Number{-10, 1}},
 		{Inf(1), Number{math.Inf(1), 0}},
@@ -118,9 +118,9 @@ func TestCeil(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Number{1, 0}, Number{1, 0}},
-		{Number{0.5, 0}, Number{1, 0}},
-		{Number{1.5, 0}, Number{2, 0}},
+		{Float(1), Number{1, 0}},
+		{Float(0.5), Number{1, 0}},
+		{Float(1.5), Number{2, 0}},
 		{Number{10, -1.5}, Number{10, -1}},
 		{Number{-10, 1.5}, Number{-10, 2}},
 		{Inf(1), Number{math.Inf(1), 0}},
@@ -143,11 +143,11 @@ func TestShift(t *testing.T) {
 	}{
 		{Number{}, +1, Number{}},
 		{Number{}, -1, Number{}},
-		{Number{1, 0}, +1, Number{2, 0}},
-		{Number{1, 0}, -1, Number{0.5, 0}},
+		{Float(1), +1, Number{2, 0}},
+		{Float(1), -1, Number{0.5, 0}},
 		{Number{-1, 0.5}, 1, Number{-2, 1}},
-		{Number{1, 0}, +127, Number{0x1p+127, 0}},
-		{Number{1, 0}, -128, Number{0x1p-128, 0}},
+		{Float(1), +127, Number{0x1p+127, 0}},
+		{Float(1), -128, Number{0x1p-128, 0}},
 		{Inf(1), +1, Number{math.Inf(1), 0}},
 		{Inf(1), -1, Number{math.Inf(1), 0}},
 		{NaN(), +1, Number{math.NaN(), 0}},
@@ -438,8 +438,8 @@ func TestCmp(t *testing.T) {
 		want int
 	}{
 		{Number{}, Number{}, 0},
-		{Number{+1, 0}, Number{}, +1},
-		{Number{-1, 0}, Number{}, -1},
+		{Float(+1), Number{}, +1},
+		{Float(-1), Number{}, -1},
 		{Number{1, +1}, Number{1, 0}, +1},
 		{Number{1, -1}, Number{1, 0}, -1},
 		{Number{}, Number{math.NaN(), 0}, +1},

@@ -34,9 +34,9 @@ func TestLog_specials(t *testing.T) {
 		arg  Number
 		want Number
 	}{
-		{Number{1, 0}, Number{}},
+		{Float(1), Number{}},
+		{Float(-1), Number{math.NaN(), 0}},
 		{Number{}, Number{math.Inf(-1), 0}},
-		{Number{-1, 0}, Number{math.NaN(), 0}},
 		{Inf(1), Number{math.Inf(1), 0}},
 		{NaN(), Number{math.NaN(), 0}},
 	}
