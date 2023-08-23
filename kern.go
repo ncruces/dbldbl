@@ -28,3 +28,18 @@ func twoProd(x, y float64) Number {
 	e := math.FMA(x, y, -r)
 	return Number{r, e}
 }
+
+func twoFMA(x, y float64, n Number) Number {
+	p := twoProd(x, y)
+	s := twoSum(n.y, p.y)
+	t := twoSum(n.x, p.x)
+	s = twoSumQuick(s.y, s.x+t.y)
+	s = twoSumQuick(s.y, s.x+t.x)
+	return s
+}
+
+func twoFMAQuick(x, y float64, n Number) Number {
+	p := twoProd(x, y)
+	s := twoSum(n.y, p.y)
+	return twoSumQuick(s.y, s.x+(n.x+p.x)) // approximation
+}

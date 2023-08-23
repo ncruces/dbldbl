@@ -60,6 +60,7 @@ func Log1p(n Number) Number {
 	case !isFinite(u.y):
 		return n
 	}
+	// log(1+n) = n⋅log(u)/(u-1), u=1+n
 	return Div(Mul(n, Log(u)), SubFloat(u, 1))
 }
 

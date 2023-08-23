@@ -38,7 +38,7 @@ func Pow(b Number, n Number) Number {
 		}
 	case IsInf(b, 0):
 		if IsInf(b, -1) {
-			return Pow(Float(1/b.y), Neg(n)) // Pow(-0, -y)
+			return Pow(Float(1/b.y), Neg(n)) // Pow(-0, -n)
 		}
 		switch {
 		case n.y < 0:

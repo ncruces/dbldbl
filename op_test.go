@@ -424,6 +424,44 @@ func TestCbrt(t *testing.T) {
 	}
 }
 
+func TestFMA(t *testing.T) {
+	a := AddFloats(1, math.E/0x1p100)
+	b := Sub(Float(1), Shift(a, 1))
+	if got := FMA(a, a, b); !same(got, Float(a.x*a.x)) {
+		t.Fatalf("FMA() = %#v, want %#v", got.y, a.x*a.x)
+	}
+
+	tests := []struct {
+		arg0 float64
+		arg1 float64
+		arg2 Number
+		want Number
+	}{
+		{0, 0, Number{}, Number{}},
+		{0, 0, Shift(Pi, -128), Shift(Pi, -128)},
+		{-math.MaxFloat32, -math.MaxFloat64, Float(+math.MaxFloat64), Inf(+1)},
+		{+math.MaxFloat64, -math.MaxFloat32, Float(-math.MaxFloat32), Inf(-1)},
+		{+math.MaxFloat64, -math.MaxFloat64, Float(-math.MaxFloat32), Inf(-1)},
+		{+math.MaxFloat64, -math.MaxFloat64, Inf(+1), Inf(+1)},
+		{-math.MaxFloat64, -math.MaxFloat64, Inf(-1), Inf(-1)},
+		{-math.MaxFloat32, math.NaN(), Inf(0), NaN()},
+		{-math.MaxFloat32, math.NaN(), Float(-math.MaxFloat32), NaN()},
+		{-math.MaxFloat32, +math.MaxFloat32, NaN(), NaN()},
+		{math.Inf(-1), math.MaxFloat32, Float(-math.MaxFloat32), Inf(-1)},
+		{math.Inf(+1), math.MaxFloat32, Float(-math.MaxFloat32), Inf(+1)},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := FMAFloat(tt.arg0, tt.arg1, tt.arg2); !same(got, tt.want) {
+				t.Errorf("FMA() = %#v, want %#v", got, tt.want)
+			}
+			if got := FMA(Float(tt.arg0), Float(tt.arg1), tt.arg2); !same(got, tt.want) {
+				t.Errorf("FMA() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestSqrDivSqrt(t *testing.T) {
 	got := Sqr(Div(Float(1), Sqrt(Float(2))))
 	if got != Float(0.5) { // (1/√2)² = 0.5

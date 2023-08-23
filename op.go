@@ -74,7 +74,7 @@ func AddFloats(a, b float64) Number {
 	return s
 }
 
-// AddFloat returns the sum of a and b (approximate).
+// AddFloat returns the sum of a and b (exactly rounded).
 func AddFloat(a Number, b float64) Number {
 	s := twoSum(a.y, b)
 	if !isFinite(s.y) {
@@ -83,7 +83,7 @@ func AddFloat(a Number, b float64) Number {
 	return twoSumQuick(s.y, s.x+a.x)
 }
 
-// Add returns the sum of a and b (approximate).
+// Add returns the sum of a and b (exactly rounded).
 func Add(a, b Number) Number {
 	s := twoSum(a.y, b.y)
 	if !isFinite(s.y) {
@@ -104,7 +104,7 @@ func SubFloats(a, b float64) Number {
 	return s
 }
 
-// SubFloat returns the difference of a and b (approximate).
+// SubFloat returns the difference of a and b (exactly rounded).
 func SubFloat(a Number, b float64) Number {
 	s := twoDiff(a.y, b)
 	if !isFinite(s.y) {
@@ -113,7 +113,7 @@ func SubFloat(a Number, b float64) Number {
 	return twoSumQuick(s.y, s.x+a.x)
 }
 
-// Sub returns the difference of a and b (approximate).
+// Sub returns the difference of a and b (exactly rounded).
 func Sub(a, b Number) Number {
 	s := twoDiff(a.y, b.y)
 	if !isFinite(s.y) {
@@ -134,7 +134,7 @@ func MulFloats(a, b float64) Number {
 	return s
 }
 
-// MulFloat returns the product of a and b (approximate).
+// MulFloat returns the product of a and b (exactly rounded).
 func MulFloat(a Number, b float64) Number {
 	s := twoProd(a.y, b)
 	if !isFinite(s.y) {
@@ -198,7 +198,29 @@ func Cbrt(n Number) Number {
 	}
 	// Newton's method: y + (n/y²-y)/3
 	t := Div(n, twoProd(y, y))
-	return twoSumQuick(y, (t.y-y+t.x)/3)
+	x := (t.y - y + t.x) / 3
+	return twoSumQuick(y, x)
+}
+
+// FMAFloat returns a⋅b + c (exactly rounded).
+func FMAFloat(a, b float64, c Number) Number {
+	s := twoFMA(a, b, c)
+	if !isFinite(s.y) {
+		return Number{y: math.FMA(a, b, c.y)}
+	}
+	return s
+}
+
+// FMA returns a⋅b + c (approximate).
+func FMA(a, b, c Number) Number {
+	s := twoFMA(a.y, b.y, c)
+	if !isFinite(s.y) {
+		return Number{y: math.FMA(a.y, b.y, c.y)}
+	}
+	s = twoFMAQuick(a.x, b.x, s)
+	s = twoFMAQuick(a.y, b.x, s)
+	s = twoFMAQuick(a.x, b.y, s)
+	return s
 }
 
 // Cmp compares x and y and returns:
