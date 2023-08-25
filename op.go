@@ -202,6 +202,30 @@ func Cbrt(n Number) Number {
 	return twoSumQuick(y, x)
 }
 
+// Inv returns the reciprocal of n (approximate).
+func Inv(n Number) Number {
+	y := 1 / n.y
+	if y == 0 || !isFinite(y) {
+		return Number{y: y}
+	}
+	// Newton's method: y + (1-n⋅y)⋅y
+	t := twoProd(y, n.y)
+	x := (1 - t.y - t.x - y*n.x) * y
+	return twoSumQuick(y, x)
+}
+
+// InvSqrt returns the reciprocal of the square root of n (approximate).
+func InvSqrt(n Number) Number {
+	y := 1 / math.Sqrt(n.y)
+	if y == 0 || !isFinite(y) {
+		return Number{y: y}
+	}
+	// Newton's method: y + (y-n⋅y³)/2
+	t := Mul(MulFloat(n, y), twoProd(y, y))
+	x := (y - t.y - t.x) * 0.5
+	return twoSumQuick(y, x)
+}
+
 // FMAFloat returns a⋅b + c (exactly rounded).
 func FMAFloat(a, b float64, c Number) Number {
 	s := twoFMA(a, b, c)

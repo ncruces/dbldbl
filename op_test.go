@@ -370,7 +370,7 @@ func TestSqrt(t *testing.T) {
 		t.Fatalf("Sqrt() = %#v, want %#v", got.y, math.Sqrt2)
 	}
 
-	if res := Sqr(got); res.y != 2 || res.x != 0 {
+	if res := Sqr(got); !same(res, Float(2)) {
 		t.Fatalf("Sqrt() = %#v, want %#v", res, 2)
 	}
 
@@ -419,6 +419,61 @@ func TestCbrt(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			if got := Cbrt(Float(tt.arg)); !same(got, Float(tt.want)) {
 				t.Errorf("Cbrt() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInv(t *testing.T) {
+	got := Inv(Pi)
+	if !same(got, Div(Float(1), Pi)) {
+		t.Fatalf("Inv() = %#v, want %#v", got, Div(Float(1), Pi))
+	}
+
+	tests := []struct {
+		arg  float64
+		want float64
+	}{
+		{math.Inf(+1), 0},
+		{math.Inf(-1), -zero},
+		{0, math.Inf(+1)},
+		{-zero, math.Inf(-1)},
+		{math.NaN(), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Inv(Float(tt.arg)); !same(got, Float(tt.want)) {
+				t.Errorf("Inv() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInvSqrt(t *testing.T) {
+	got := InvSqrt(Pi)
+	if got.y != 1/math.Sqrt(math.Pi) {
+		t.Fatalf("InvSqrt() = %#v, want %#v", got.y, 1/math.Sqrt(math.Pi))
+	}
+
+	if res := Inv(Sqr(got)); res.y != math.Pi || math.Abs(res.x-Pi.x) > 0x1p-104 {
+		t.Fatalf("InvSqrt() = %#v, want %#v", res, Pi)
+	}
+
+	tests := []struct {
+		arg  float64
+		want float64
+	}{
+		{0, math.Inf(+1)},
+		{-1, math.NaN()},
+		{-zero, math.Inf(-1)},
+		{math.Inf(+1), 0},
+		{math.Inf(-1), math.NaN()},
+		{math.NaN(), math.NaN()},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := InvSqrt(Float(tt.arg)); !same(got, Float(tt.want)) {
+				t.Errorf("InvSqrt() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
