@@ -49,7 +49,7 @@ func Pow(b Number, n Number) Number {
 	case n == Float(+0.5):
 		return Sqrt(b)
 	case n == Float(-0.5):
-		return Div(Float(1), Sqrt(b))
+		return InvSqrt(b)
 	case n == Floor(n):
 		return pow(b, n)
 	case b.y < 0:
@@ -74,7 +74,7 @@ func pow(b Number, n Number) Number {
 		b = Sqr(b)
 	}
 	if n.y < 0 {
-		return Div(Float(1), r)
+		return Inv(r)
 	}
 	return r
 }

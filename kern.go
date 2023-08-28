@@ -3,7 +3,7 @@ package dbldbl
 import "math"
 
 func twoSumQuick(x, y float64) Number {
-	// |x| > |y|
+	// log₂|x| ≥ log₂|y|
 	r := x + y
 	e := y - (r - x)
 	return Number{r, e}

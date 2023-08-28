@@ -17,7 +17,7 @@ func Log(n Number) Number {
 
 	negate := true
 	if n.y > 1 {
-		n = Div(Float(1), n)
+		n = Inv(n)
 		negate = false
 	}
 
