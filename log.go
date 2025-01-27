@@ -83,14 +83,11 @@ func agm(a, g Number) Number {
 	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean
 	for {
 		t := scalb(Add(a, g), -1)
-		if a == t {
+		if t == a {
 			return a
 		}
 		g = Sqrt(Mul(a, g))
 		a = t
-		if a == g {
-			return a
-		}
 	}
 }
 
