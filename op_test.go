@@ -135,10 +135,10 @@ func TestCeil(t *testing.T) {
 	}
 }
 
-func TestShift(t *testing.T) {
+func TestLdexp(t *testing.T) {
 	tests := []struct {
 		arg  Number
-		exp  int8
+		exp  int
 		want Number
 	}{
 		{Number{}, +1, Number{}},
@@ -155,8 +155,8 @@ func TestShift(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Shift(tt.arg, tt.exp); !same(got, tt.want) {
-				t.Errorf("Shift() = %#v, want %#v", got, tt.want)
+			if got := Ldexp(tt.arg, tt.exp); !same(got, tt.want) {
+				t.Errorf("Ldexp() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -481,7 +481,7 @@ func TestInvSqrt(t *testing.T) {
 
 func TestFMA(t *testing.T) {
 	a := AddFloats(1, math.E/0x1p100)
-	b := Sub(Float(1), Shift(a, 1))
+	b := Sub(Float(1), scalb(a, 1))
 	if got := FMA(a, a, b); !same(got, Float(a.x*a.x)) {
 		t.Fatalf("FMA() = %#v, want %#v", got.y, a.x*a.x)
 	}
@@ -493,7 +493,7 @@ func TestFMA(t *testing.T) {
 		want Number
 	}{
 		{0, 0, Number{}, Number{}},
-		{0, 0, Shift(Pi, -128), Shift(Pi, -128)},
+		{0, 0, Ldexp(Pi, -128), Ldexp(Pi, -128)},
 		{-math.MaxFloat32, -math.MaxFloat64, Float(+math.MaxFloat64), Inf(+1)},
 		{+math.MaxFloat64, -math.MaxFloat32, Float(-math.MaxFloat32), Inf(-1)},
 		{+math.MaxFloat64, -math.MaxFloat64, Float(-math.MaxFloat32), Inf(-1)},

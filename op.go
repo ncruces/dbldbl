@@ -59,10 +59,13 @@ func Ceil(n Number) Number {
 	return Number{y: y, x: math.Ceil(n.x)}
 }
 
-// Shift returns the product of n by 2ⁱ (exact).
-func Shift(n Number, i int8) Number {
-	e := math.Float64frombits((1023 + uint64(i)) << 52)
-	return Number{y: e * n.y, x: e * n.x}
+// Ldexp returns the product of n by 2ⁱ (exact).
+func Ldexp(n Number, i int) Number {
+	y := math.Ldexp(n.y, i)
+	if y == 0 || !isFinite(y) {
+		return Number{y: y}
+	}
+	return Number{y: y, x: math.Ldexp(n.x, i)}
 }
 
 // AddFloats returns the sum of a and b (exact).

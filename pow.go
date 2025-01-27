@@ -70,7 +70,7 @@ func pow(b Number, n Number) Number {
 		if i.y == 0 {
 			break
 		}
-		i = Shift(i, -1)
+		i = scalb(i, -1)
 		b = Sqr(b)
 	}
 	if n.y < 0 {

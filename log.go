@@ -21,15 +21,15 @@ func Log(n Number) Number {
 		negate = false
 	}
 
-	var shift int8
+	var shift int
 	for n.y > 0x1p-54 {
 		n = Sqr(n)
 		shift--
 	}
 
 	// log(1/n) = π / 2⋅AGM(1, 4⋅n)
-	n = Div(Pi, agm(Float(1), Shift(n, 2)))
-	n = Shift(n, shift-1)
+	n = Div(Pi, agm(Float(1), scalb(n, 2)))
+	n = Ldexp(n, shift-1)
 	if negate {
 		n = Neg(n)
 	}
@@ -82,7 +82,7 @@ func Expm1(n Number) Number {
 func agm(a, g Number) Number {
 	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean
 	for {
-		t := Shift(Add(a, g), -1)
+		t := scalb(Add(a, g), -1)
 		if a == t {
 			return a
 		}
@@ -92,4 +92,11 @@ func agm(a, g Number) Number {
 			return a
 		}
 	}
+}
+
+func scalb(n Number, i int8) Number {
+	// This is like ldexp, but nicer when i is a small constant,
+	// because it gets inlined and skips some branching.
+	e := math.Float64frombits((1023 + uint64(i)) << 52)
+	return Number{y: e * n.y, x: e * n.x}
 }
