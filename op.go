@@ -4,7 +4,7 @@ import "math"
 
 // Neg negates n (exact).
 func Neg(n Number) Number {
-	return Number{y: -n.y, x: 0 - n.x}
+	return Number{-n.y, 0 - n.x}
 }
 
 // Abs returns the absolute value of n (exact).
@@ -47,7 +47,7 @@ func Floor(n Number) Number {
 	if y != n.y {
 		return Number{y: y}
 	}
-	return Number{y: y, x: math.Floor(n.x)}
+	return Number{y, math.Floor(n.x)}
 }
 
 // Ceil returns the least integer value greater than or equal to n (exact).
@@ -56,7 +56,35 @@ func Ceil(n Number) Number {
 	if y != n.y {
 		return Number{y: y}
 	}
-	return Number{y: y, x: math.Ceil(n.x)}
+	return Number{y, math.Ceil(n.x)}
+}
+
+// Round returns the nearest integer, rounding half away from zero (exact)..
+func Round(n Number) Number {
+	y := math.Round(n.y)
+
+	switch d := y - n.y; {
+	case math.IsNaN(d):
+		return n
+
+	case d != 0:
+		switch {
+		case n.x < 0 && d == +0.5:
+			return twoSumQuick(y, -1)
+		case n.x > 0 && d == -0.5:
+			return twoSumQuick(y, +1)
+		}
+		return Number{y: y}
+	}
+
+	x := math.Round(n.x)
+	switch {
+	case n.y < 0 && x-n.x == +0.5:
+		x--
+	case n.y > 0 && x-n.x == -0.5:
+		x++
+	}
+	return twoSumQuick(n.y, x)
 }
 
 // Ldexp returns the product of n by 2ⁱ (exact).
@@ -65,7 +93,7 @@ func Ldexp(n Number, i int) Number {
 	if y == 0 || !isFinite(y) {
 		return Number{y: y}
 	}
-	return Number{y: y, x: math.Ldexp(n.x, i)}
+	return Number{y, math.Ldexp(n.x, i)}
 }
 
 // AddFloats returns the sum of a and b (exact).
@@ -284,5 +312,5 @@ func scalb(n Number, i int8) Number {
 	// This is like ldexp, but nicer when i is a small constant,
 	// because it gets inlined and skips some branching.
 	e := math.Float64frombits((1023 + uint64(i)) << 52)
-	return Number{y: e * n.y, x: e * n.x}
+	return Number{e * n.y, e * n.x}
 }

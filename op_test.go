@@ -135,6 +135,33 @@ func TestCeil(t *testing.T) {
 	}
 }
 
+func TestRound(t *testing.T) {
+	tests := []struct {
+		arg  Number
+		want Number
+	}{
+		{Number{}, Number{}},
+		{Float(1), Number{1, 0}},
+		{Float(0.5), Number{1, 0}},
+		{Float(1.5), Number{2, 0}},
+		{Number{10, -1.5}, Number{9, 0}},
+		{Number{-10, 1.5}, Number{-9, 0}},
+		{NaN(), Number{math.NaN(), 0}},
+		{Inf(1), Number{math.Inf(1), 0}},
+		{Number{+0.5, -1e-20}, Number{0, 0}},
+		{Number{+0.5, +1e-20}, Number{1, 0}},
+		{Number{-0.5, +1e-20}, Number{0, 0}},
+		{Number{-0.5, -1e-20}, Number{-1, 0}},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Round(tt.arg); !same(got, tt.want) {
+				t.Errorf("Round() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestLdexp(t *testing.T) {
 	tests := []struct {
 		arg  Number

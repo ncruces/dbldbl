@@ -12,8 +12,9 @@ func Sincos(n Number) (sin, cos Number) {
 	}
 
 	// Range reduction modulo π/2.
-	k := math.Round(n.y / (math.Pi * 0.5))
-	r := Sub(n, MulFloat(scalb(Pi, -1), k))
+	halfPi := Number{Pi.y / 2, Pi.x / 2}
+	k := Round(Div(n, halfPi))
+	r := Sub(n, Mul(halfPi, k))
 
 	// Halve the angle until it is less than 2⁻⁵³.
 	var halvings int8
@@ -33,7 +34,9 @@ func Sincos(n Number) (sin, cos Number) {
 		cos = Neg(SubFloat(scalb(Sqr(s), 1), 1)) // cos(2⋅t) = 1 - 2⋅sin²(t)
 	}
 
-	switch int64(k) & 3 {
+	yi, _ := math.Modf(k.y)
+	xi, _ := math.Modf(k.x)
+	switch (int64(xi) | int64(yi)) & 3 {
 	default:
 		return sin, cos
 	case 1:
