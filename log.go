@@ -90,10 +90,3 @@ func agm(a, g Number) Number {
 		a = t
 	}
 }
-
-func scalb(n Number, i int8) Number {
-	// This is like ldexp, but nicer when i is a small constant,
-	// because it gets inlined and skips some branching.
-	e := math.Float64frombits((1023 + uint64(i)) << 52)
-	return Number{y: e * n.y, x: e * n.x}
-}
