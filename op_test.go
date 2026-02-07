@@ -263,7 +263,7 @@ func TestSub(t *testing.T) {
 			if got := SubFloats(tt.arg1, tt.arg2); !same(got, Float(tt.want)) {
 				t.Errorf("SubFloats() = %#v, want %#v", got, tt.want)
 			}
-			if got := SubFloat(Float(tt.arg1), tt.arg2); !same(got, Float(tt.want)) {
+			if got := SubFloat(tt.arg1, Float(tt.arg2)); !same(got, Float(tt.want)) {
 				t.Errorf("SubFloat() = %#v, want %#v", got, tt.want)
 			}
 			if got := Sub(Float(tt.arg1), Float(tt.arg2)); !same(got, Float(tt.want)) {
@@ -589,7 +589,7 @@ func TestPolynomial(t *testing.T) {
 	}
 
 	const want = 40037.49486
-	if d := math.Abs(SubFloat(got, want).y); d > 0.5e-5 {
+	if d := math.Abs(SubFloat(want, got).y); d > 0.5e-5 {
 		t.Fatalf("got %.5f want %.5f", got.y, want)
 	}
 }

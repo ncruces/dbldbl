@@ -136,12 +136,12 @@ func SubFloats(a, b float64) Number {
 }
 
 // SubFloat returns the difference of a and b (exactly rounded).
-func SubFloat(a Number, b float64) Number {
-	s := twoDiff(a.y, b)
+func SubFloat(a float64, b Number) Number {
+	s := twoDiff(a, b.y)
 	if !isFinite(s.y) {
 		return Number{y: s.y}
 	}
-	return twoSumQuick(s.y, s.x+a.x)
+	return twoSumQuick(s.y, s.x-b.x)
 }
 
 // Sub returns the difference of a and b (exactly rounded).

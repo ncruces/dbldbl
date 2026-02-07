@@ -14,15 +14,12 @@ func Pow(b Number, n Number) Number {
 	case b.y == 0:
 		switch {
 		case n.y < 0:
-			if isOddInteger(n) {
-				if math.Signbit(b.y) {
-					return Inf(-1)
-				}
-				return Inf(1)
+			if math.Signbit(b.y) && isOddInteger(n) {
+				return Inf(-1)
 			}
 			return Inf(1)
 		case n.y > 0:
-			if isOddInteger(n) {
+			if math.Signbit(b.y) && isOddInteger(n) {
 				return b
 			}
 			return Number{}
@@ -31,7 +28,7 @@ func Pow(b Number, n Number) Number {
 		switch {
 		case b == Float(-1):
 			return Float(1)
-		case (SubFloat(Abs(b), 1).y < 0) == IsInf(n, 1):
+		case (SubFloat(1, Abs(b)).y > 0) == IsInf(n, 1):
 			return Number{}
 		default:
 			return Inf(1)

@@ -6,32 +6,30 @@ import "math"
 func Sincos(n Number) (sin, cos Number) {
 	switch {
 	case n.y == 0:
-		return n, Float(1) // return ±0.0, 1.0
+		return n, Float(1) // ±0.0, 1.0
 	case IsNaN(n) || IsInf(n, 0):
 		return NaN(), NaN()
 	}
 
 	// Range reduction modulo π/2.
-	halfPi := Number{Pi.y / 2, Pi.x / 2}
 	k := Round(Div(n, halfPi))
 	r := Sub(n, Mul(halfPi, k))
 
 	// Halve the angle until it is less than 2⁻⁵³.
 	var halvings int8
-	if _, e := math.Frexp(r.y); e > -53 {
+	if _, e := math.Frexp(r.y); r.y != 0 && e > -53 {
 		halvings = int8(53 + e)
 	}
 
-	// These approximations are good enough for 107-bits of precision.
-	sin = scalb(r, -halvings) // sin(r) ≈ r
-	cos = Float(1)            // cos(r) ≈ 1
+	// For |θ|<2⁻⁵³ these are accurate to 107 bits.
+	sin = scalb(r, -halvings) // sin(θ) ≈ θ
+	cos = Float(1)            // cos(θ) ≈ 1
 
-	// Angle doubling.
-	// The cosine formula offers the best numeric stability.
+	// Double-angle formulae.
 	for range halvings {
 		s, c := sin, cos
-		sin = scalb(Mul(s, c), 1)                // sin(2⋅t) = 2⋅sin(t)⋅cos(t)
-		cos = Neg(SubFloat(scalb(Sqr(s), 1), 1)) // cos(2⋅t) = 1 - 2⋅sin²(t)
+		sin = scalb(Mul(s, c), 1)           // sin(2⋅t) = 2⋅sin(θ)⋅cos(θ)
+		cos = SubFloat(1, scalb(Sqr(s), 1)) // cos(2⋅t) = 1 - 2⋅sin²(θ)
 	}
 
 	yi, _ := math.Modf(k.y)
@@ -48,20 +46,89 @@ func Sincos(n Number) (sin, cos Number) {
 	}
 }
 
-// Sin returns the sine of the radian argument n.
+// Sin returns the sine of the radian argument n (approximate).
 func Sin(n Number) Number {
 	sin, _ := Sincos(n)
 	return sin
 }
 
-// Cos returns the cosine of the radian argument n.
+// Cos returns the cosine of the radian argument n (approximate).
 func Cos(n Number) Number {
 	_, cos := Sincos(n)
 	return cos
 }
 
-// Tan returns the tangent of the radian argument n.
+// Tan returns the tangent of the radian argument n (approximate).
 func Tan(n Number) Number {
 	sin, cos := Sincos(n)
 	return Div(sin, cos)
+}
+
+// Asin returns the arcsine, in radians, of n (approximate).
+func Asin(n Number) Number {
+	// asin(θ) = atan2(θ, √(1-θ²))
+	return Atan2(n, Sqrt(SubFloat(1, Sqr(n))))
+}
+
+// Acos returns the arccosine, in radians, of n (approximate).
+func Acos(n Number) Number {
+	// acos(θ) = atan2(√(1-θ²), θ)
+	return Atan2(Sqrt(SubFloat(1, Sqr(n))), n)
+}
+
+// Atan returns the arctangent, in radians, of n (approximate).
+func Atan(n Number) Number {
+	switch {
+	case n.y == 0:
+		return n
+	case n.y < 0:
+		// atan(θ) = -atan(-θ)
+		return Neg(Atan(Neg(n)))
+	case n.y > 1:
+		// atan(θ) = π/2 - atan(1/θ), if θ>0
+		return Sub(halfPi, Atan(Inv(n)))
+	case IsNaN(n):
+		return NaN()
+	}
+
+	// Reduce the argument until it is less than 2⁻⁵³.
+	var doublings int8
+	for math.Abs(n.y) > 0x1p-53 {
+		// atan(θ) = 2·atan(θ/(1+√(1+θ²)))
+		n = Div(n, AddFloat(Sqrt(AddFloat(Sqr(n), 1)), 1))
+		doublings++
+	}
+
+	// For |θ|<2⁻⁵³ this is accurate to 107 bits
+	return scalb(n, doublings) // atan(θ) ≈ θ
+}
+
+// Atan2 returns the arc tangent of y/x, using the signs of the two
+// to determine the quadrant of the return value (approximate).
+func Atan2(y, x Number) Number {
+	switch {
+	case y.y == 0 && x.y == 0:
+		switch {
+		case !math.Signbit(x.y):
+			return Number{y: math.Copysign(0, y.y)}
+		case math.Signbit(y.y):
+			return Neg(Pi)
+		default:
+			return Pi
+		}
+	case IsInf(y, 0) && IsInf(x, 0):
+		y = Number{y: math.Copysign(1, y.y)}
+		x = Number{y: math.Copysign(1, x.y)}
+	}
+
+	z := Atan(Div(y, x))
+
+	switch {
+	case !math.Signbit(x.y):
+		return z
+	case math.Signbit(y.y):
+		return Sub(z, Pi)
+	default:
+		return Add(z, Pi)
+	}
 }

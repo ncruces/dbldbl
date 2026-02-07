@@ -13,27 +13,19 @@ func Log(n Number) Number {
 		return Number{y: math.Log1p(n.x)}
 	case !isFinite(n.y):
 		return n
+	case n.y > 1:
+		return Neg(Log(Inv(n)))
 	}
 
-	negate := true
-	if n.y > 1 {
-		n = Inv(n)
-		negate = false
-	}
-
-	var shift int
+	var halvings int8
 	for n.y > 0x1p-54 {
 		n = Sqr(n)
-		shift--
+		halvings--
 	}
 
 	// log(1/n) = π / 2⋅AGM(1, 4⋅n)
 	n = Div(Pi, agm(Float(1), scalb(n, 2)))
-	n = Ldexp(n, shift-1)
-	if negate {
-		n = Neg(n)
-	}
-	return n
+	return Neg(scalb(n, halvings-1))
 }
 
 // Exp returns eⁿ, the base-e exponential of n (approximate).
@@ -61,7 +53,7 @@ func Log1p(n Number) Number {
 		return n
 	}
 	// log(1+n) = n⋅log(u)/(u-1), u=1+n
-	return Div(Mul(n, Log(u)), SubFloat(u, 1))
+	return Div(Mul(n, Log(u)), AddFloat(u, -1))
 }
 
 // Expm1 returns eⁿ-1, the base-e exponential of n minus 1 (approximate).
@@ -72,7 +64,7 @@ func Expm1(n Number) Number {
 	case y == 0 || !isFinite(y):
 		return Number{y: y}
 	case y == -1:
-		return SubFloat(Exp(n), 1)
+		return AddFloat(Exp(n), -1)
 	}
 	// Newton's method: y + (y+1)⋅(n-log1p(y))
 	t := Sub(n, Log1p(Float(y)))
