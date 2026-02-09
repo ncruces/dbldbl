@@ -7,22 +7,22 @@ func Sincos(n Number) (sin, cos Number) {
 	switch {
 	case n.y == 0:
 		return n, Float(1) // ±0.0, 1.0
-	case IsNaN(n) || IsInf(n, 0):
+	case !isFinite(n.y):
 		return NaN(), NaN()
 	}
 
 	// Range reduction modulo π/2.
 	k := Round(Div(n, halfPi))
-	r := Sub(n, Mul(halfPi, k))
+	t := Sub(n, Mul(halfPi, k))
 
 	// Halve the angle until it is less than 2⁻⁵³.
 	var halvings int8
-	if _, e := math.Frexp(r.y); r.y != 0 && e > -53 {
+	if _, e := math.Frexp(t.y); t.y != 0 && e > -53 {
 		halvings = int8(53 + e)
 	}
 
 	// For |θ|<2⁻⁵³ these are accurate to 107 bits.
-	sin = scalb(r, -halvings) // sin(θ) ≈ θ
+	sin = scalb(t, -halvings) // sin(θ) ≈ θ
 	cos = Float(1)            // cos(θ) ≈ 1
 
 	// Double-angle formulae.
@@ -110,7 +110,7 @@ func Atan2(y, x Number) Number {
 	case y.y == 0 && x.y == 0:
 		switch {
 		case !math.Signbit(x.y):
-			return Number{y: math.Copysign(0, y.y)}
+			return Number{y: y.y}
 		case math.Signbit(y.y):
 			return Neg(Pi)
 		default:

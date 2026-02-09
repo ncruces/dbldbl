@@ -4,59 +4,28 @@ import "math"
 
 // Sinh returns the hyperbolic sine of n (approximate).
 func Sinh(n Number) Number {
-	switch {
-	case n.y == 0:
-		return n // ±0
-	case IsNaN(n):
-		return n
-	case IsInf(n, 0):
-		return n // ±Inf
+	t := Expm1(n)
+	if t.y == 0 || !isFinite(t.y) {
+		return Number{y: math.Copysign(t.y, n.y)}
 	}
-
-	// For small |n| use Expm1 for better accuracy.
-	// sinh(n) = (expm1(n) + expm1(n)/(expm1(n)+1)) / 2
-	if math.Abs(n.y) < 0.5 {
-		t := Expm1(n)
-		return scalb(Add(t, Div(t, AddFloat(t, 1))), -1)
-	}
-
-	// For large |n| use (e^n - e^(-n)) / 2
-	ep := Exp(n)
-	en := Exp(Neg(n))
-	return scalb(Sub(ep, en), -1)
+	t2 := scalb(t, -1)
+	return Add(t2, Div(t2, AddFloat(t, 1)))
 }
 
 // Cosh returns the hyperbolic cosine of n (approximate).
 func Cosh(n Number) Number {
-	switch {
-	case n.y == 0:
-		return Float(1) // cosh(±0) = 1
-	case IsNaN(n):
-		return n
-	case IsInf(n, 0):
-		return Inf(1) // cosh(±Inf) = +Inf
-	}
-
-	// cosh(n) = (e^n + e^(-n)) / 2
-	ep := Exp(n)
-	en := Exp(Neg(n))
-	return scalb(Add(ep, en), -1)
+	t := Exp(Abs(n))
+	return Add(scalb(t, -1), scalb(Inv(t), -1))
 }
 
 // Tanh returns the hyperbolic tangent of n (approximate).
 func Tanh(n Number) Number {
 	switch {
 	case n.y == 0:
-		return n // ±0
-	case IsNaN(n):
 		return n
-	case IsInf(n, 1):
-		return Float(1) // tanh(+Inf) = +1
-	case IsInf(n, -1):
-		return Float(-1) // tanh(-Inf) = -1
+	case math.Abs(n.y) > 100:
+		return Number{y: math.Copysign(1, n.y)}
 	}
-
-	// For better accuracy: tanh(n) = expm1(2n) / (expm1(2n) + 2)
 	t := Expm1(scalb(n, 1))
 	return Div(t, AddFloat(t, 2))
 }
