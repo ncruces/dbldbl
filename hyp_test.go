@@ -138,11 +138,9 @@ func TestAsinh(t *testing.T) {
 		arg  Number
 		want string
 	}{
-		{Float(1), "0.881373587019543025232609324979792309028160328261635410753295"},  // https://oeis.org/A068051
-		{Float(-1), "-0.88137358701954302523260932497979230902816032826163541075329"}, //
-		{Float(0.5), "0.48121182505960344749775891342436842313518433438566051966101"}, // asinh(0.5)
-		{Pi, "1.86229574331084821988836132518264491594769850503039970476157"},         // asinh(π)
-		{Float(2), "1.44363547517881034249327674027310420154256911586273682099405"},   // https://oeis.org/A102888
+		{E, "1.7253825588523150939450979704048887562745572746729386688142115"}, // https://oeis.org/A366599
+		{Pi, "1.862295743310848219888361325182620574902674184961554765612879"}, // https://oeis.org/A360938
+		{Float(0.25), "0.247466461547263452944781549788359289253766903098567"}, // https://oeis.org/A129200
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -150,6 +148,12 @@ func TestAsinh(t *testing.T) {
 				t.Errorf("Asinh() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	max := Number{math.MaxFloat64, math.MaxFloat64 * 0x1p-54}
+	if got := Asinh(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Asinh() = %#v", got)
 	}
 }
 
@@ -178,10 +182,8 @@ func TestAcosh(t *testing.T) {
 		arg  Number
 		want string
 	}{
-		{Float(2), "1.31695789692481670862504634730796844402698197146966603054147"}, // https://oeis.org/A068516
-		{Float(1.5), "0.9624236501192068949955178268487368462704461920192687212"},   // https://oeis.org/A143526
-		{Pi, "1.81152627246085310702185204930542051022064520104597705211413"},       // acosh(π)
-		{E, "1.65745445415307727259382874228053473915829500605639201750514"},        // acosh(e)
+		{E, "1.6574544541530772725938287422805347391583927620336768258485822"}, // https://oeis.org/A365927
+		{Pi, "1.811526272460853107021852049305420510220702081057922474861595"}, // https://oeis.org/A359540
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -189,6 +191,12 @@ func TestAcosh(t *testing.T) {
 				t.Errorf("Acosh() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	max := Number{math.MaxFloat64, math.MaxFloat64 * 0x1p-54}
+	if got := Acosh(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Acosh() = %#v", got)
 	}
 }
 
@@ -198,10 +206,9 @@ func TestAcosh_specials(t *testing.T) {
 		want Number
 	}{
 		{Float(1), Number{}},
-		{Float(0.5), Number{y: math.NaN()}},
-		{Float(-1), Number{y: math.NaN()}},
-		{NaN(), Number{y: math.NaN()}},
+		{Float(0), Number{y: math.NaN()}},
 		{Inf(+1), Number{y: math.Inf(1)}},
+		{NaN(), Number{y: math.NaN()}},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {

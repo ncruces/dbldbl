@@ -38,40 +38,31 @@ func Tanh(n Number) Number {
 // Asinh returns the inverse hyperbolic sine of n (approximate).
 func Asinh(n Number) Number {
 	switch {
-	case n.y == 0:
-		return n // ±0
-	case IsNaN(n):
+	case n.y == 0 || !isFinite(n.y):
 		return n
-	case IsInf(n, 0):
-		return n // ±Inf
-	}
-
-	// For negative n: asinh(-n) = -asinh(n)
-	if n.y < 0 {
+	case n.y < 0:
 		return Neg(Asinh(Neg(n)))
+	case n.y > 100:
+		return Add(Log(n), Ln2)
 	}
 
-	// For better accuracy: asinh(n) = log1p(n + n²/(√(n²+1)+1))
-	n2 := Sqr(n)
-	return Log1p(Add(n, Div(n2, AddFloat(Sqrt(AddFloat(n2, 1)), 1))))
+	t := Sqr(n)
+	return Log1p(Add(n, Div(t, AddFloat(Sqrt(AddFloat(t, 1)), 1))))
 }
 
 // Acosh returns the inverse hyperbolic cosine of n (approximate).
 func Acosh(n Number) Number {
 	switch {
 	case n.y < 1:
-		return NaN() // acosh(n) = NaN if n < 1
-	case n.y == 1 && n.x == 0:
-		return Number{} // acosh(1) = 0
-	case IsInf(n, 1):
-		return n // acosh(+Inf) = +Inf
-	case IsNaN(n):
+		return NaN()
+	case !isFinite(n.y):
 		return n
+	case n.y > 100:
+		return Add(Log(n), Ln2)
 	}
 
-	// For better accuracy: acosh(n) = log1p((n-1) + √((n-1)·(n+1)))
 	t := AddFloat(n, -1)
-	return Log1p(Add(t, Sqrt(Mul(t, AddFloat(n, 1)))))
+	return Log1p(Add(t, Sqrt(Add(scalb(t, 1), Sqr(t)))))
 }
 
 // Atanh returns the inverse hyperbolic tangent of n (approximate).

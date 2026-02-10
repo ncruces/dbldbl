@@ -110,11 +110,11 @@ func Atan2(y, x Number) Number {
 	case y.y == 0 && x.y == 0:
 		switch {
 		case !math.Signbit(x.y):
-			return Number{y: y.y}
-		case math.Signbit(y.y):
-			return Neg(Pi)
-		default:
+			return y
+		case !math.Signbit(y.y):
 			return Pi
+		default:
+			return Neg(Pi)
 		}
 	case IsInf(y, 0) && IsInf(x, 0):
 		y = Number{y: math.Copysign(1, y.y)}
@@ -126,9 +126,9 @@ func Atan2(y, x Number) Number {
 	switch {
 	case !math.Signbit(x.y):
 		return z
-	case math.Signbit(y.y):
-		return Sub(z, Pi)
-	default:
+	case !math.Signbit(y.y):
 		return Add(z, Pi)
+	default:
+		return Sub(z, Pi)
 	}
 }
