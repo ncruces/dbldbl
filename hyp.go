@@ -4,12 +4,17 @@ import "math"
 
 // Sinh returns the hyperbolic sine of n (approximate).
 func Sinh(n Number) Number {
-	t := Expm1(n)
-	if t.y == 0 || !isFinite(t.y) {
-		return Number{y: math.Copysign(t.y, n.y)}
+	switch {
+	case n.y == 0:
+		return n
+	case n.y < 0:
+		return Neg(Sinh(Neg(n)))
 	}
-	t2 := scalb(t, -1)
-	return Add(t2, Div(t2, AddFloat(t, 1)))
+	if n = Expm1(n); !isFinite(n.y) {
+		return n
+	}
+	t := scalb(n, -1)
+	return Add(t, Div(t, AddFloat(n, 1)))
 }
 
 // Cosh returns the hyperbolic cosine of n (approximate).

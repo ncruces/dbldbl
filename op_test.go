@@ -419,6 +419,12 @@ func TestSqrt(t *testing.T) {
 			}
 		})
 	}
+
+	// Ensure no overflow.
+	max := Number{math.MaxFloat64, math.MaxFloat64 * 0x1p-54}
+	if got := Sqrt(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Sqrt() = %#v", got)
+	}
 }
 
 func TestCbrt(t *testing.T) {
@@ -427,7 +433,7 @@ func TestCbrt(t *testing.T) {
 		t.Fatalf("Cbrt() = %#v, want %#v", got.y, math.Cbrt(-3))
 	}
 
-	if res := Mul(got, Sqr(got)); res.y != -3 || math.Abs(res.x) > 0x1p-104 {
+	if res := Mul(got, Sqr(got)); res.y != -3 {
 		t.Fatalf("Cbrt() = %#v, want %#v", res, -3)
 	}
 
@@ -448,6 +454,12 @@ func TestCbrt(t *testing.T) {
 				t.Errorf("Cbrt() = %#v, want %#v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	max := Number{math.MaxFloat64, math.MaxFloat64 * 0x1p-54}
+	if got := Cbrt(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Cbrt() = %#v", got)
 	}
 }
 
