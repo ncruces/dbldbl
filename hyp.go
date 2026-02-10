@@ -69,19 +69,13 @@ func Acosh(n Number) Number {
 func Atanh(n Number) Number {
 	switch {
 	case n.y == 0:
-		return n // ±0
-	case IsNaN(n):
 		return n
-	case n.y == 1 && n.x == 0:
-		return Inf(1) // atanh(1) = +Inf
-	case n.y == -1 && n.x == 0:
-		return Inf(-1) // atanh(-1) = -Inf
-	}
-
-	// Check if |n| > 1
-	absN := Abs(n)
-	if absN.y > 1 || (absN.y == 1 && absN.x > 0) {
-		return NaN() // atanh(n) = NaN if |n| > 1
+	case n.y < 0:
+		return Neg(Atanh(Neg(n)))
+	case n.y > 1 || n.y == 1 && n.x > 0:
+		return NaN()
+	case n.y == 1:
+		return Inf(1)
 	}
 
 	// For better accuracy: atanh(n) = log1p(2n/(1-n)) / 2
