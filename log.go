@@ -53,7 +53,7 @@ func Log1p(n Number) Number {
 		return n
 	}
 	// log(1+n) = n⋅log(u)/(u-1), u=1+n
-	return Div(Mul(n, Log(u)), AddFloat(u, -1))
+	return Mul(n, Div(Log(u), AddFloat(u, -1)))
 }
 
 // Expm1 returns eⁿ-1, the base-e exponential of n minus 1 (approximate).
@@ -64,7 +64,7 @@ func Expm1(n Number) Number {
 	case y == 0 || !isFinite(y):
 		return Number{y: y}
 	case y == -1:
-		return AddFloat(Exp(n), -1)
+		return SubFloats(math.Exp(n.y), 1)
 	}
 	// Newton's method: y + (y+1)⋅(n-log1p(y))
 	t := Sub(n, Log1p(Float(y)))

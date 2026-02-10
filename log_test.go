@@ -12,12 +12,12 @@ func TestLog(t *testing.T) {
 		arg  Number
 		want string
 	}{
-		{Pi, "1.14472988584940017414342735135305871164729481291531157151362307"},        // https://oeis.org/A053510
-		{Phi, "0.481211825059603447497758913424368423135184334385660519661018168"},      // https://oeis.org/A002390
-		{Float(2), "0.693147180559945309417232121458176568075500134360255254120680009"}, // https://oeis.org/A002162
-		{Float(3), "1.09861228866810969139524523692252570464749055782274945173469433"},  // https://oeis.org/A002391
-		{Float(10), "2.30258509299404568401799145468436420760110148862877297603332790"}, // https://oeis.org/A002392
-		{Float(0.5), "-0.693147180559945309417232121458176568075500134360255254120680009"},
+		{Pi, "1.144729885849400174143427351353058711647294812915311571513623"}, // https://oeis.org/A053510
+		{Phi, "0.48121182505960344749775891342436842313518433438566051966101"}, // https://oeis.org/A002390
+		{Float(2), "0.693147180559945309417232121458176568075500134360255254"}, // https://oeis.org/A002162
+		{Float(3), "1.098612288668109691395245236922525704647490557822749451"}, // https://oeis.org/A002391
+		{Float(10), "2.30258509299404568401799145468436420760110148862877297"}, // https://oeis.org/A002392
+		{Float(0.5), "-0.693147180559945309417232121458176568075500134360255"},
 		{Float(math.Nextafter(1, 2)), "2.2204460492503128343282295362e-16"},
 		{AddFloats(1, 0x1p-55), "2.7755575615628913510590791702e-17"},
 	}
@@ -27,6 +27,17 @@ func TestLog(t *testing.T) {
 				t.Errorf("Log() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	max := Number{math.MaxFloat64, math.MaxFloat64 * 0x1p-54}
+	if got := Log(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Log() = %#v", got)
+	}
+	// Ensure no underflow.
+	min := Number{math.SmallestNonzeroFloat64, 0}
+	if got := Log(min); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Log() = %#v", got)
 	}
 }
 
@@ -55,10 +66,10 @@ func TestExp(t *testing.T) {
 		arg  Number
 		want string
 	}{
-		{Pi, "23.1406926327792690057290863679485473802661062426002119934450464"},       // https://oeis.org/A039661
-		{Phi, "5.04316564336002865131188218928542471032359017541384636030200019"},      // https://oeis.org/A139341
-		{Float(1), "2.71828182845904523536028747135266249775724709369995957496696762"}, // https://oeis.org/A072334
-		{Float(2), "7.38905609893065022723042746057500781318031557055184732408712782"}, // https://oeis.org/A001113
+		{Pi, "23.14069263277926900572908636794854738026610624260021199344504"}, // https://oeis.org/A039661
+		{Phi, "5.04316564336002865131188218928542471032359017541384636030200"}, // https://oeis.org/A139341
+		{Float(1), "2.718281828459045235360287471352662497757247093699959574"}, // https://oeis.org/A001113
+		{Float(2), "7.389056098930650227230427460575007813180315570551847324"}, // https://oeis.org/A072334
 		{Float(0x1p-55), "1.000000000000000027755575615628914"},
 	}
 	for _, tt := range tests {
@@ -67,6 +78,11 @@ func TestExp(t *testing.T) {
 				t.Errorf("Exp() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	if got := Exp(Float(709)); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Exp() = %#v", got)
 	}
 }
 
@@ -87,6 +103,19 @@ func TestExp_specials(t *testing.T) {
 				t.Errorf("Exp() = %#v, want %#v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestLog1p(t *testing.T) {
+	// Ensure no overflow.
+	max := Number{math.MaxFloat64, math.MaxFloat64 * 0x1p-54}
+	if got := Log1p(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Log1p() = %#v", got)
+	}
+	// Ensure no underflow.
+	min := Number{math.Nextafter(-1, 0), 0}
+	if got := Log1p(min); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Log1p() = %#v", got)
 	}
 }
 
@@ -116,10 +145,10 @@ func TestExpm1(t *testing.T) {
 		arg  Number
 		want string
 	}{
-		{Pi, "22.1406926327792690057290863679485473802661062426002119934450464"},       // https://oeis.org/A039661
-		{Phi, "4.04316564336002865131188218928542471032359017541384636030200019"},      // https://oeis.org/A139341
-		{Float(1), "1.71828182845904523536028747135266249775724709369995957496696762"}, // https://oeis.org/A072334
-		{Float(2), "6.38905609893065022723042746057500781318031557055184732408712782"}, // https://oeis.org/A001113
+		{Pi, "22.14069263277926900572908636794854738026610624260021199344504"}, // https://oeis.org/A039661
+		{Phi, "4.04316564336002865131188218928542471032359017541384636030200"}, // https://oeis.org/A139341
+		{Float(1), "1.718281828459045235360287471352662497757247093699959574"}, // https://oeis.org/A001113
+		{Float(2), "6.389056098930650227230427460575007813180315570551847324"}, // https://oeis.org/A072334
 		{Float(0x1p-55), "2.77555756156289135105907917022705e-17"},
 	}
 	for _, tt := range tests {
@@ -128,6 +157,11 @@ func TestExpm1(t *testing.T) {
 				t.Errorf("Expm1() = %#v, want %#v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	if got := Expm1(Float(709)); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Expm1() = %#v", got)
 	}
 }
 
