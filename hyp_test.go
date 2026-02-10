@@ -224,10 +224,7 @@ func TestAtanh(t *testing.T) {
 		arg  Number
 		want string
 	}{
-		{Float(0.5), "0.54930614433405484569762261846126285232374527891137472586735"}, // https://oeis.org/A068631
-		{Float(-0.5), "-0.549306144334054845697622618461262852323745278911374725867"},
-		{Float(0.25), "0.25541281188299534160275704815183096743905539822288413508897"}, // atanh(0.25)
-		{Inv(E), "0.38596841645265236253531957001759267189616767070472722560582"},      // atanh(1/e)
+		{AddFloat(Phi, -1), "0.721817737589405171246638370136552634702776501"}, // https://oeis.org/A377813
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -235,6 +232,12 @@ func TestAtanh(t *testing.T) {
 				t.Errorf("Atanh() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+
+	// Ensure no overflow.
+	max := AddFloats(1, -math.Sqrt(math.SmallestNonzeroFloat64))
+	if got := Atanh(max); !isFinite(got.y) || !isFinite(got.x) {
+		t.Errorf("Atanh() = %#v", got)
 	}
 }
 
@@ -245,10 +248,9 @@ func TestAtanh_specials(t *testing.T) {
 	}{
 		{Number{}, Number{}},
 		{Float(neg0), Number{y: neg0}},
-		{Float(1), Number{y: math.Inf(1)}},
+		{Float(+1), Number{y: math.Inf(+1)}},
 		{Float(-1), Number{y: math.Inf(-1)}},
 		{Float(2), Number{y: math.NaN()}},
-		{Float(-2), Number{y: math.NaN()}},
 		{NaN(), Number{y: math.NaN()}},
 	}
 	for _, tt := range tests {

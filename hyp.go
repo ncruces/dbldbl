@@ -74,10 +74,9 @@ func Atanh(n Number) Number {
 		return Neg(Atanh(Neg(n)))
 	case n.y > 1 || n.y == 1 && n.x > 0:
 		return NaN()
-	case n.y == 1:
+	case n.y == 1 && n.x == 0:
 		return Inf(1)
 	}
 
-	// For better accuracy: atanh(n) = log1p(2n/(1-n)) / 2
 	return scalb(Log1p(Div(scalb(n, 1), SubFloat(1, n))), -1)
 }
