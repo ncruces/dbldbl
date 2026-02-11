@@ -10,17 +10,17 @@ func Sinh(n Number) Number {
 	case n.y < 0:
 		return Neg(Sinh(Neg(n)))
 	}
-	if n = Expm1(n); !isFinite(n.y) {
-		return n
+	t := Expm1(n)
+	if !isFinite(t.y) {
+		return t
 	}
-	t := scalb(n, -1)
-	return Add(t, Div(t, AddFloat(n, 1)))
+	return scalb(Add(t, Div(t, AddFloat(t, 1))), -1)
 }
 
 // Cosh returns the hyperbolic cosine of n (approximate).
 func Cosh(n Number) Number {
 	t := Exp(Abs(n))
-	return Add(scalb(t, -1), scalb(Inv(t), -1))
+	return scalb(Add(t, Inv(t)), -1)
 }
 
 // Tanh returns the hyperbolic tangent of n (approximate).
@@ -74,8 +74,8 @@ func Atanh(n Number) Number {
 		return Neg(Atanh(Neg(n)))
 	case n.y > 1 || n.y == 1 && n.x > 0:
 		return NaN()
-	case n.y == 1 && n.x == 0:
-		return Inf(1)
+	case n == Float(1):
+		return Inf(0)
 	}
 
 	return scalb(Log1p(Div(scalb(n, 1), SubFloat(1, n))), -1)

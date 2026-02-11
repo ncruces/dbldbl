@@ -538,7 +538,7 @@ func TestFMA(t *testing.T) {
 		{+math.MaxFloat64, -math.MaxFloat64, Float(-math.MaxFloat32), Inf(-1)},
 		{+math.MaxFloat64, -math.MaxFloat64, Inf(+1), Inf(+1)},
 		{-math.MaxFloat64, -math.MaxFloat64, Inf(-1), Inf(-1)},
-		{-math.MaxFloat32, math.NaN(), Inf(0), NaN()},
+		{-math.MaxFloat32, math.NaN(), Inf(1), NaN()},
 		{-math.MaxFloat32, math.NaN(), Float(-math.MaxFloat32), NaN()},
 		{-math.MaxFloat32, +math.MaxFloat32, NaN(), NaN()},
 		{math.Inf(-1), math.MaxFloat32, Float(-math.MaxFloat32), Inf(-1)},

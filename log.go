@@ -17,15 +17,17 @@ func Log(n Number) Number {
 		return Neg(Log(Inv(n)))
 	}
 
+	// Reduce the argument until it is less than 2⁻⁵⁵.
 	var halvings int8
-	for n.y > 0x1p-54 {
-		n = Sqr(n)
-		halvings--
+	for n.y > 0x1p-55 {
+		n = Sqr(n) // log(n) = log(n²)/2
+		halvings++
 	}
 
-	// log(1/n) = π / 2⋅AGM(1, 4⋅n)
-	n = Div(Pi, agm(Float(1), scalb(n, 2)))
-	return Neg(scalb(n, halvings-1))
+	// For n<2⁻⁵⁵ this is accurate to 107 bits:
+	// log(1/n) ≈ π / 2⋅AGM(1, 4⋅n)
+	n = Div(halfPi, agm(Float(1), scalb(n, 2)))
+	return Neg(scalb(n, -halvings)) // log(n) = -log(1/n)
 }
 
 // Exp returns eⁿ, the base-e exponential of n (approximate).
@@ -47,9 +49,7 @@ func Log1p(n Number) Number {
 	switch {
 	case u.y < 0:
 		return NaN()
-	case u == Float(1):
-		return n
-	case !isFinite(u.y):
+	case u == Float(1) || !isFinite(u.y):
 		return n
 	}
 	// log(1+n) = n⋅log(u)/(u-1), u=1+n
@@ -72,7 +72,7 @@ func Expm1(n Number) Number {
 }
 
 func agm(a, g Number) Number {
-	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean
+	// https://en.wikipedia.org/wiki/Arithmetic–geometric_mean
 	for {
 		t := scalb(Add(a, g), -1)
 		if t == a {

@@ -6,7 +6,7 @@ import "math"
 func Sincos(n Number) (sin, cos Number) {
 	switch {
 	case n.y == 0:
-		return n, Float(1) // ±0.0, 1.0
+		return n, Float(1)
 	case !isFinite(n.y):
 		return NaN(), NaN()
 	}

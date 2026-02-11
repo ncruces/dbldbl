@@ -52,9 +52,9 @@ func (n Number) Format(f fmt.State, verb rune) {
 	}
 }
 
-func (n Number) toBig() *big.Float {
+func (n Number) toBig() (r *big.Float) {
+	r = big.NewFloat(n.x).SetPrec(107)
 	var t big.Float
 	t.SetFloat64(n.y)
-	r := big.NewFloat(n.x).SetPrec(107)
 	return r.Add(r, &t)
 }

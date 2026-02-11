@@ -12,14 +12,13 @@ func Pow(b Number, n Number) Number {
 	case IsNaN(b) || IsNaN(n):
 		return NaN()
 	case b.y == 0:
-		switch {
-		case n.y < 0:
-			if math.Signbit(b.y) && isOddInteger(n) {
+		if math.Signbit(n.y) {
+			if isOddInteger(n) && math.Signbit(b.y) {
 				return Inf(-1)
 			}
-			return Inf(1)
-		case n.y > 0:
-			if math.Signbit(b.y) && isOddInteger(n) {
+			return Inf(0)
+		} else {
+			if isOddInteger(n) {
 				return b
 			}
 			return Number{}
@@ -31,17 +30,17 @@ func Pow(b Number, n Number) Number {
 		case (SubFloat(1, Abs(b)).y > 0) == IsInf(n, 1):
 			return Number{}
 		default:
-			return Inf(1)
+			return Inf(0)
 		}
 	case IsInf(b, 0):
-		if IsInf(b, -1) {
-			return Pow(Float(1/b.y), Neg(n)) // Pow(-0, -n)
-		}
 		switch {
+		case IsInf(b, -1):
+			var neg0 = Float(math.Copysign(0, -1))
+			return Pow(neg0, Neg(n))
 		case n.y < 0:
 			return Number{}
 		case n.y > 0:
-			return Inf(1)
+			return Inf(0)
 		}
 	case n == Float(+0.5):
 		return Sqrt(b)

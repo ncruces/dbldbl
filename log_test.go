@@ -18,8 +18,8 @@ func TestLog(t *testing.T) {
 		{Float(3), "1.098612288668109691395245236922525704647490557822749451"}, // https://oeis.org/A002391
 		{Float(10), "2.30258509299404568401799145468436420760110148862877297"}, // https://oeis.org/A002392
 		{Float(0.5), "-0.693147180559945309417232121458176568075500134360255"},
-		{Float(math.Nextafter(1, 2)), "2.2204460492503128343282295362e-16"},
-		{AddFloats(1, 0x1p-55), "2.7755575615628913510590791702e-17"},
+		{Float(math.Nextafter(1, 2)), "2.2204460492503128343282295362059e-16"},
+		{AddFloats(1, 0x1p-55), "2.77555756156289135105907917022705e-17"},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -154,7 +154,7 @@ func TestExpm1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			if got := Expm1(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
-				t.Errorf("Expm1() = %#v, want %#v", got, tt.want)
+				t.Errorf("Expm1() = %v, want %v", got, tt.want)
 			}
 		})
 	}
