@@ -109,3 +109,20 @@ func TestPow_specials(t *testing.T) {
 		})
 	}
 }
+
+func TestPow10_specials(t *testing.T) {
+	tests := []struct {
+		arg  int
+		want Number
+	}{
+		{309, Inf(1)},
+		{-309, Number{}},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			if got := Pow10(tt.arg); !same(got, tt.want) {
+				t.Errorf("Pow10() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}

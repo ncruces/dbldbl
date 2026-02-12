@@ -7,9 +7,14 @@ func Neg(n Number) Number {
 	return Number{-n.y, 0 - n.x}
 }
 
+// Signbit reports whether x is negative or negative zero.
+func Signbit(n Number) bool {
+	return math.Signbit(n.y)
+}
+
 // Abs returns the absolute value of n (exact).
 func Abs(n Number) Number {
-	if math.Signbit(n.y) {
+	if Signbit(n) {
 		return Neg(n)
 	}
 	return n
@@ -59,7 +64,7 @@ func Ceil(n Number) Number {
 	return Number{y, math.Ceil(n.x)}
 }
 
-// Round returns the nearest integer, rounding half away from zero (exact)..
+// Round returns the nearest integer, rounding half away from zero (exact).
 func Round(n Number) Number {
 	y := math.Round(n.y)
 

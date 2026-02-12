@@ -12,8 +12,9 @@ func Sincos(n Number) (sin, cos Number) {
 	}
 
 	// Range reduction modulo π/2.
-	k := Round(Div(n, halfPi))
-	t := Sub(n, Mul(halfPi, k))
+	twoOfPi := Number{0.6366197723675814, -3.935735335036497e-17}
+	k := Round(Mul(n, twoOfPi))
+	t := Sub(n, Mul(k, halfPi))
 
 	// Halve the angle until it is less than 2⁻⁵³.
 	var halvings int8
@@ -109,9 +110,9 @@ func Atan2(y, x Number) Number {
 	switch {
 	case y.y == 0 && x.y == 0:
 		switch {
-		case !math.Signbit(x.y):
+		case !Signbit(x):
 			return y
-		case !math.Signbit(y.y):
+		case !Signbit(y):
 			return Pi
 		default:
 			return Neg(Pi)
@@ -124,9 +125,9 @@ func Atan2(y, x Number) Number {
 	z := Atan(Div(y, x))
 
 	switch {
-	case !math.Signbit(x.y):
+	case !Signbit(x):
 		return z
-	case !math.Signbit(y.y):
+	case !Signbit(y):
 		return Add(z, Pi)
 	default:
 		return Sub(z, Pi)

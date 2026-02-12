@@ -12,8 +12,8 @@ func Pow(b Number, n Number) Number {
 	case IsNaN(b) || IsNaN(n):
 		return NaN()
 	case b.y == 0:
-		if math.Signbit(n.y) {
-			if isOddInteger(n) && math.Signbit(b.y) {
+		if Signbit(n) {
+			if isOddInteger(n) && Signbit(b) {
 				return Inf(-1)
 			}
 			return Inf(0)
@@ -53,6 +53,11 @@ func Pow(b Number, n Number) Number {
 	}
 
 	return Exp(Mul(Log(b), n))
+}
+
+// Pow10 returns 10ⁱ, the base-10 exponential of i (approximate).
+func Pow10(i int) Number {
+	return pow(Float(10), Int(int64(i)))
 }
 
 func pow(b Number, n Number) Number {
