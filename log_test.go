@@ -1,9 +1,7 @@
 package dbldbl
 
 import (
-	"fmt"
 	"math"
-	"strings"
 	"testing"
 )
 
@@ -23,7 +21,7 @@ func TestLog(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Log(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Log(tt.arg); !near(got, tt.want) {
 				t.Errorf("Log() = %v, want %v", got, tt.want)
 			}
 		})
@@ -74,7 +72,7 @@ func TestExp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Exp(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Exp(tt.arg); !near(got, tt.want) {
 				t.Errorf("Exp() = %v, want %v", got, tt.want)
 			}
 		})
@@ -153,7 +151,7 @@ func TestExpm1(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Expm1(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Expm1(tt.arg); !near(got, tt.want) {
 				t.Errorf("Expm1() = %v, want %v", got, tt.want)
 			}
 		})
@@ -190,7 +188,7 @@ func Test_agm(t *testing.T) {
 	// https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean#Example
 	got := agm(Float(24), Float(6))
 	want := "13.4581714817256154207668131569743992430538388544"
-	if !strings.HasPrefix(want, fmt.Sprint(got)[:30]) {
+	if !near(got, want) {
 		t.Errorf("agm = %v, want %v", got, want)
 	}
 }

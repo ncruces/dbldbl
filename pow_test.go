@@ -1,10 +1,6 @@
 package dbldbl
 
-import (
-	"fmt"
-	"strings"
-	"testing"
-)
+import "testing"
 
 func TestPow(t *testing.T) {
 	tests := []struct {
@@ -19,7 +15,7 @@ func TestPow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Pow(tt.arg0, tt.arg1); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Pow(tt.arg0, tt.arg1); !near(got, tt.want) {
 				t.Errorf("Pow() = %v, want %v", got, tt.want)
 			}
 		})

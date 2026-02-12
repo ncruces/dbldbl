@@ -25,6 +25,7 @@ var (
 	Ln2  = Number{0.6931471805599453, 2.3190468138462996e-17} // https://oeis.org/A002162
 	Ln10 = Number{2.302585092994046, -2.1707562233822494e-16} // https://oeis.org/A002392
 
-	twoPi  = Number{Pi.y * 2, Pi.x * 2}
-	halfPi = Number{Pi.y / 2, Pi.x / 2}
+	twoPi   = Number{Pi.y * 2, Pi.x * 2}
+	halfPi  = Number{Pi.y / 2, Pi.x / 2}
+	twoOfPi = Number{0.6366197723675814, -3.935735335036497e-17} // https://oeis.org/A060294
 )

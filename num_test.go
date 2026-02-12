@@ -2,6 +2,7 @@ package dbldbl
 
 import (
 	"math"
+	"math/big"
 	"testing"
 )
 
@@ -59,11 +60,19 @@ func TestUint(t *testing.T) {
 	}
 }
 
-var zero = 0.0
+var zero float64
 
 func same(a, b Number) bool {
-	return IsNaN(a) && IsNaN(b) ||
+	return IsNaN(a) && IsNaN(b) || (true &&
 		math.Float64bits(a.y) == math.Float64bits(b.y) &&
-			math.Float64bits(a.x) == math.Float64bits(b.x)
+		math.Float64bits(a.x) == math.Float64bits(b.x))
 
+}
+
+func near(a Number, b string) bool {
+	const prec = 101
+	xa := a.toBig().SetPrec(prec)
+	xp, _, _ := big.ParseFloat(b, 0, prec, big.ToPositiveInf)
+	xn, _, _ := big.ParseFloat(b, 0, prec, big.ToNegativeInf)
+	return xp.Cmp(xa) == 0 || xn.Cmp(xa) == 0
 }

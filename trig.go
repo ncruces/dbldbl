@@ -12,7 +12,6 @@ func Sincos(n Number) (sin, cos Number) {
 	}
 
 	// Range reduction modulo π/2.
-	twoOfPi := Number{0.6366197723675814, -3.935735335036497e-17}
 	k := Round(Mul(n, twoOfPi))
 	t := Sub(n, Mul(k, halfPi))
 

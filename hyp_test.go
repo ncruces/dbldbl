@@ -1,9 +1,7 @@
 package dbldbl
 
 import (
-	"fmt"
 	"math"
-	"strings"
 	"testing"
 )
 
@@ -19,7 +17,7 @@ func TestSinh(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Sinh(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Sinh(tt.arg); !near(got, tt.want) {
 				t.Errorf("Sinh() = %v, want %v", got, tt.want)
 			}
 		})
@@ -37,7 +35,7 @@ func TestSinh_specials(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Float(neg0), Number{y: neg0}},
+		{Float(-zero), Number{y: -zero}},
 		{NaN(), Number{y: math.NaN()}},
 		{Inf(+1), Number{y: math.Inf(1)}},
 		{Inf(-1), Number{y: math.Inf(-1)}},
@@ -63,7 +61,7 @@ func TestCosh(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Cosh(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Cosh(tt.arg); !near(got, tt.want) {
 				t.Errorf("Cosh() = %v, want %v", got, tt.want)
 			}
 		})
@@ -81,7 +79,7 @@ func TestCosh_specials(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{1, 0}},
-		{Float(neg0), Number{1, 0}},
+		{Float(-zero), Number{1, 0}},
 		{NaN(), Number{y: math.NaN()}},
 		{Inf(+1), Number{y: math.Inf(1)}},
 		{Inf(-1), Number{y: math.Inf(1)}},
@@ -106,7 +104,7 @@ func TestTanh(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Tanh(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Tanh(tt.arg); !near(got, tt.want) {
 				t.Errorf("Tanh() = %v, want %v", got, tt.want)
 			}
 		})
@@ -119,7 +117,7 @@ func TestTanh_specials(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Float(neg0), Number{y: neg0}},
+		{Float(-zero), Number{y: -zero}},
 		{NaN(), Number{y: math.NaN()}},
 		{Inf(+1), Number{1, 0}},
 		{Inf(-1), Number{-1, 0}},
@@ -145,7 +143,7 @@ func TestAsinh(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Asinh(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Asinh(tt.arg); !near(got, tt.want) {
 				t.Errorf("Asinh() = %v, want %v", got, tt.want)
 			}
 		})
@@ -164,7 +162,7 @@ func TestAsinh_specials(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Float(neg0), Number{y: neg0}},
+		{Float(-zero), Number{y: -zero}},
 		{NaN(), Number{y: math.NaN()}},
 		{Inf(+1), Number{y: math.Inf(1)}},
 		{Inf(-1), Number{y: math.Inf(-1)}},
@@ -188,7 +186,7 @@ func TestAcosh(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Acosh(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Acosh(tt.arg); !near(got, tt.want) {
 				t.Errorf("Acosh() = %v, want %v", got, tt.want)
 			}
 		})
@@ -229,7 +227,7 @@ func TestAtanh(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := Atanh(tt.arg); !strings.HasPrefix(tt.want, fmt.Sprint(got)[:30]) {
+			if got := Atanh(tt.arg); !near(got, tt.want) {
 				t.Errorf("Atanh() = %v, want %v", got, tt.want)
 			}
 		})
@@ -248,7 +246,7 @@ func TestAtanh_specials(t *testing.T) {
 		want Number
 	}{
 		{Number{}, Number{}},
-		{Float(neg0), Number{y: neg0}},
+		{Float(-zero), Number{y: -zero}},
 		{Float(+1), Number{y: math.Inf(+1)}},
 		{Float(-1), Number{y: math.Inf(-1)}},
 		{Float(2), Number{y: math.NaN()}},

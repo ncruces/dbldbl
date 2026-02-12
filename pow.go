@@ -35,8 +35,8 @@ func Pow(b Number, n Number) Number {
 	case IsInf(b, 0):
 		switch {
 		case IsInf(b, -1):
-			var neg0 = Float(math.Copysign(0, -1))
-			return Pow(neg0, Neg(n))
+			var zero float64
+			return Pow(Float(-zero), Neg(n))
 		case n.y < 0:
 			return Number{}
 		case n.y > 0:
