@@ -66,7 +66,6 @@ func same(a, b Number) bool {
 	return IsNaN(a) && IsNaN(b) || (true &&
 		math.Float64bits(a.y) == math.Float64bits(b.y) &&
 		math.Float64bits(a.x) == math.Float64bits(b.x))
-
 }
 
 func near(a Number, b string) bool {
@@ -75,4 +74,32 @@ func near(a Number, b string) bool {
 	xp, _, _ := big.ParseFloat(b, 0, prec, big.ToPositiveInf)
 	xn, _, _ := big.ParseFloat(b, 0, prec, big.ToNegativeInf)
 	return xp.Cmp(xa) == 0 || xn.Cmp(xa) == 0
+}
+
+func parse(s string) Number {
+	f, _, _ := big.ParseFloat(s, 0, 107, big.ToNearestEven)
+	return fromBig(f)
+}
+
+func (n Number) toBig() (b *big.Float) {
+	b = big.NewFloat(n.x).SetPrec(107)
+	var t big.Float
+	t.SetFloat64(n.y)
+	return b.Add(b, &t)
+}
+
+func fromBig(b *big.Float) (n Number) {
+	var a big.Accuracy
+	n.y, a = b.Float64()
+	if a == big.Exact {
+		return n
+	}
+
+	var t big.Float
+	t.SetPrec(107).Sub(b, big.NewFloat(n.y))
+	n.x, a = t.Float64()
+	if a != big.Exact {
+		panic(a)
+	}
+	return n
 }

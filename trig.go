@@ -22,14 +22,14 @@ func Sincos(n Number) (sin, cos Number) {
 	}
 
 	// For |θ|<2⁻⁵³ these are accurate to 107 bits.
-	sin = scalb(t, -halvings) // sin(θ) ≈ θ
+	sin = shift(t, -halvings) // sin(θ) ≈ θ
 	cos = Float(1)            // cos(θ) ≈ 1
 
 	// Double-angle formulae.
 	for range halvings {
 		s, c := sin, cos
-		sin = scalb(Mul(s, c), 1)           // sin(2⋅t) = 2⋅sin(θ)⋅cos(θ)
-		cos = SubFloat(1, scalb(Sqr(s), 1)) // cos(2⋅t) = 1 - 2⋅sin²(θ)
+		sin = shift(Mul(s, c), 1)           // sin(2⋅t) = 2⋅sin(θ)⋅cos(θ)
+		cos = SubFloat(1, shift(Sqr(s), 1)) // cos(2⋅t) = 1 - 2⋅sin²(θ)
 	}
 
 	yi, _ := math.Modf(k.y)
@@ -100,7 +100,7 @@ func Atan(n Number) Number {
 	}
 
 	// For |θ|<2⁻⁵³ this is accurate to 107 bits
-	return scalb(n, doublings) // atan(θ) ≈ θ
+	return shift(n, doublings) // atan(θ) ≈ θ
 }
 
 // Atan2 returns the arc tangent of y/x, using the signs of the two

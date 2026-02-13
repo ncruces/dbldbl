@@ -9,5 +9,11 @@ func (n Number) String() string {
 
 // GoString implements [fmt.GoStringer].
 func (n Number) GoString() string {
-	return "Number{" + strconv.FormatFloat(n.y, 'g', -1, 64) + ", " + strconv.FormatFloat(n.x, 'e', -1, 64) + "}"
+	y := strconv.FormatFloat(n.y, 'g', -1, 64)
+	x := strconv.FormatFloat(n.x, 'x', -1, 64)
+	sep := ", +"
+	if x[0] == '-' {
+		sep = sep[:2]
+	}
+	return "Number{" + y + sep + x + "}"
 }

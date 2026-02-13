@@ -14,13 +14,13 @@ func Sinh(n Number) Number {
 	if !isFinite(t.y) {
 		return t
 	}
-	return scalb(Add(t, Div(t, AddFloat(t, 1))), -1)
+	return shift(Add(t, Div(t, AddFloat(t, 1))), -1)
 }
 
 // Cosh returns the hyperbolic cosine of n (approximate).
 func Cosh(n Number) Number {
 	t := Exp(Abs(n))
-	return scalb(Add(t, Inv(t)), -1)
+	return shift(Add(t, Inv(t)), -1)
 }
 
 // Tanh returns the hyperbolic tangent of n (approximate).
@@ -31,7 +31,7 @@ func Tanh(n Number) Number {
 	case math.Abs(n.y) > 100:
 		return Number{y: math.Copysign(1, n.y)}
 	}
-	t := Expm1(scalb(n, 1))
+	t := Expm1(shift(n, 1))
 	return Div(t, AddFloat(t, 2))
 }
 
@@ -62,7 +62,7 @@ func Acosh(n Number) Number {
 	}
 
 	t := AddFloat(n, -1)
-	return Log1p(Add(t, Sqrt(Add(scalb(t, 1), Sqr(t)))))
+	return Log1p(Add(t, Sqrt(Add(shift(t, 1), Sqr(t)))))
 }
 
 // Atanh returns the inverse hyperbolic tangent of n (approximate).
@@ -78,5 +78,5 @@ func Atanh(n Number) Number {
 		return Inf(0)
 	}
 
-	return scalb(Log1p(Div(scalb(n, 1), SubFloat(1, n))), -1)
+	return shift(Log1p(Div(shift(n, 1), SubFloat(1, n))), -1)
 }

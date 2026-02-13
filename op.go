@@ -313,7 +313,7 @@ func isFinite(x float64) bool {
 	return math.Float64bits(x)>>52&0x7ff != 0x7ff
 }
 
-func scalb(n Number, i int8) Number {
+func shift(n Number, i int8) Number {
 	// This is like ldexp, but nicer when i is a small constant,
 	// because it gets inlined and skips some branching.
 	e := math.Float64frombits((1023 + uint64(i)) << 52)

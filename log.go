@@ -26,8 +26,8 @@ func Log(n Number) Number {
 
 	// For n<2⁻⁵⁵ this is accurate to 107 bits:
 	// log(1/n) ≈ π / 2⋅AGM(1, 4⋅n)
-	n = Div(halfPi, agm(Float(1), scalb(n, 2)))
-	return Neg(scalb(n, -halvings)) // log(n) = -log(1/n)
+	n = Div(halfPi, agm(Float(1), shift(n, 2)))
+	return Neg(shift(n, -halvings)) // log(n) = -log(1/n)
 }
 
 // Exp returns eⁿ, the base-e exponential of n (approximate).
@@ -74,7 +74,7 @@ func Expm1(n Number) Number {
 func agm(a, g Number) Number {
 	// https://en.wikipedia.org/wiki/Arithmetic–geometric_mean
 	for {
-		t := scalb(Add(a, g), -1)
+		t := shift(Add(a, g), -1)
 		if t == a {
 			return a
 		}

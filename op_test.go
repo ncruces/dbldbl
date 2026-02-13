@@ -520,7 +520,7 @@ func TestInvSqrt(t *testing.T) {
 
 func TestFMA(t *testing.T) {
 	a := AddFloats(1, math.E/0x1p100)
-	b := Sub(Float(1), scalb(a, 1))
+	b := Sub(Float(1), shift(a, 1))
 	if got := FMA(a, a, b); !same(got, Float(a.x*a.x)) {
 		t.Fatalf("FMA() = %#v, want %#v", got.y, a.x*a.x)
 	}
