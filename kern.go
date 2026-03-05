@@ -4,27 +4,27 @@ import "math"
 
 func twoSumQuick(x, y float64) Number {
 	// log₂|x| ≥ log₂|y|
-	r := x + y
-	e := y - (r - x)
+	r := float64(x + y)
+	e := y - float64(r-x)
 	return Number{r, e}
 }
 
 func twoSum(x, y float64) Number {
-	r := x + y
-	t := r - x
-	e := (x - (r - t)) + (y - t)
+	r := float64(x + y)
+	t := float64(r - x)
+	e := float64(x-float64(r-t)) + float64(y-t)
 	return Number{r, e}
 }
 
 func twoDiff(x, y float64) Number {
-	r := x - y
-	t := r - x
-	e := (x - (r - t)) - (y + t)
+	r := float64(x - y)
+	t := float64(r - x)
+	e := float64(x-float64(r-t)) - float64(y+t)
 	return Number{r, e}
 }
 
 func twoProd(x, y float64) Number {
-	r := x * y
+	r := float64(x * y)
 	e := math.FMA(x, y, -r)
 	return Number{r, e}
 }
